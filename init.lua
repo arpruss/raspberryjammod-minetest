@@ -23,15 +23,36 @@ minetest.register_globalstep(function(dtime)
     end
 end)
 
+function getplayer()
+    return minetest.get_connected_players()[1]
+end
+
 function handlecommand(client, line)
-    print("Command received: "..line)
+    --print("Command received: "..line)
     local cmd, argtext = string.match(line, "([^(]+)%((.*)%)")
+    if not cmd then return end
     local args = {}
     for arg in string.gmatch(argtext, "([^,]+)") do
         table.insert(args, arg)
     end
     if cmd == "chat.post" then
         minetest.chat_send_all(argtext)
+    elseif cmd == "player.getPos" then
+        local player = getplayer()
+        print(player)
+        print(player:is_player())
+        print(player:get_player_name())
+        local pos = player:getpos()
+        print(pos.x)
+        print(pos.y)
+        print(pos.z)
+        client:send(""..(pos.x)..","..(pos.y)..","..(pos.z).."\n")
+    elseif cmd == "player.setPos" then
+        local pos = {}
+        pos.x = tonumber(args[1])
+        pos.y = tonumber(args[2])
+        pos.z = tonumber(args[3])
+        getplayer():setpos(pos)
     end
 end
 
