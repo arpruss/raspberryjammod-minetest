@@ -1,3 +1,4 @@
+local block = require("block")
 local socket = require("socket")
 local server = socket.bind("*", 4711)
 server:settimeout(0)
@@ -30,12 +31,8 @@ function getplayer()
     return minetest.get_connected_players()[1]
 end
 
-local BLOCKS = {}
-BLOCKS[bit.bor(bit.lshift(0,4),0)] = {name="air"}
-BLOCKS[bit.bor(bit.lshift(1,4),0)] = {name="default:stone"}
 
 function handlecommand(client, line)
-    print("Command received: "..line)
     local cmd, argtext = string.match(line, "([^(]+)%((.*)%)")
     if not cmd then return end
     local args = {}
@@ -54,18 +51,20 @@ function handlecommand(client, line)
         if #args == 3 then
             nodenum = 0
         elseif #args == 4 then
-            nodenum = bit.lshift(tonumber(args[4]),4)
+            nodenum = block.Block(tonumber(args[4]),0)
         else
-            nodenum = bit.bor(bit.lshift(tonumber(args[4]),4),tonumber(args[5]))
+            nodenum = block.Block(tonumber(args[4]),tonumber(args[5]))
         end
-        local node = BLOCKS[nodenum]
+        local node = block.BLOCK[nodenum]
         if not node then
-            node = BLOCKS[bit.band(nodenum,0xFFF0)]
+            node = block.BLOCK[bit.band(nodenum,0xFFF)]
             if not node then
-                node = BLOCKS[bit.lshift(1,4)]
+                node = block.BLOCK[STONE]
             end
         end
-        minetest.set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])},node)
+        local pos = {x=tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])}
+        --print(pos.x,pos.y,pos.z,node.name)
+        minetest.set_node(pos,node)
     end
 end
 
