@@ -227,7 +227,7 @@ block.BLOCK[block.CACTUS]={name="default:cactus"}
 block.BLOCK[block.CLAY]={name="default:clay"}
 --block.BLOCK[block.SUGAR_CANE]={name="default:"}
 block.BLOCK[block.FENCE]={name="default:fence_wood"}
-block.BLOCK[block.GLOWSTONE_BLOCK]={name="default:mese_lamp"} -- fix
+block.BLOCK[block.GLOWSTONE_BLOCK]={name="default:meselamp"} -- fix
 --block.BLOCK[block.BEDROCK_INVISIBLE]={name="default:"}
 block.BLOCK[block.STAINED_GLASS]={name="default:glass"} -- fix
 block.BLOCK[block.STONE_BRICK]={name="default:stonebrick"}
@@ -238,11 +238,11 @@ block.BLOCK[block.GLASS_PANE]={name="default:glass"} -- fix
 block.BLOCK[block.REDSTONE_BLOCK]={name="wool:red"} -- fix
 block.BLOCK[block.QUARTZ_BLOCK]={name="wool:white"}
 block.BLOCK[block.HARDENED_CLAY_STAINED]={name="wool:white"} --fix
-block.BLOCK[block.SEA_LANTERN]={name="default:mese_lamp"}
+block.BLOCK[block.SEA_LANTERN]={name="default:meselamp"}
 block.BLOCK[block.CARPET]={name="wool:white"} -- fix
 block.BLOCK[block.COAL_BLOCK]={name="default:coalblock"}
 --block.BLOCK[block.REDSTONE_LAMP_INACTIVE]={name="default:"}
-block.BLOCK[block.REDSTONE_LAMP_ACTIVE]={name="default:mese_lamp"}
+block.BLOCK[block.REDSTONE_LAMP_ACTIVE]={name="default:meselamp"}
 --block.BLOCK[block.SUNFLOWER]={name="default:"}
 --block.BLOCK[block.LILAC]={name="default:"}
 block.BLOCK[block.DOUBLE_TALLGRASS]={name="default:grass_2"} --fix

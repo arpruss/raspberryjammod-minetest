@@ -1,3 +1,12 @@
+if string.find(package.path, "%\\%?") then
+     package.path = package.path .. ";" .. string.gsub(package.path, "bin%\\lua%\\%?%.lua", "mods\\raspberryjammod\\?.lua")
+     package.cpath = package.cpath .. ";" .. string.gsub(package.cpath, "bin%\\%?", "mods\\raspberryjammod\\?")
+else
+     package.path = package.path .. ";" .. string.gsub(package.path, "bin%/lua%/%?%.lua", "mods/raspberryjammod/?.lua")
+     package.cpath = package.cpath .. ";" .. string.gsub(package.cpath, "bin%/%?", "mods/raspberryjammod/?")
+end
+print(package.path)
+print(package.cpath)
 local block = require("block")
 local socket = require("socket")
 local server = socket.bind("*", 4711)
