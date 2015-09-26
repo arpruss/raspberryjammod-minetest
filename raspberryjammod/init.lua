@@ -85,14 +85,14 @@ function handle_entity(cmd, id, args)
     local entity = getplayer(id)
     if cmd == "getPos" then
         local pos = entity:getpos()
-        return ""..(-pos.x)..","..(pos.y-0.5)..","..(pos.z)
+        return ""..(-pos.x)..","..(pos.y+0.5)..","..(pos.z)
     elseif cmd == "getTile" then
         local pos = entity:getpos()
-        return ""..math.floor(-pos.x)..","..math.floor(pos.y-0.4999)..","..math.floor(pos.z)
+        return ""..math.floor(-pos.x)..","..math.floor(pos.y+0.5001)..","..math.floor(pos.z)
     elseif cmd == "setPos" then
-        entity:setpos({x=-tonumber(args[1]), y=tonumber(args[2])+0.5, z=tonumber(args[3])})
+        entity:setpos({x=-tonumber(args[1]), y=tonumber(args[2])-0.5, z=tonumber(args[3])})
     elseif cmd == "setTile" then
-        entity:setpos({x=-(0.5+tonumber(args[1])), y=tonumber(args[2])+0.5, z=0.5+tonumber(args[3])})
+        entity:setpos({x=-(0.5+tonumber(args[1])), y=tonumber(args[2])-0.5, z=0.5+tonumber(args[3])})
     elseif cmd == "getPitch" then
         return ""..(entity:get_look_pitch() * -180 / math.pi)
     elseif cmd == "getRotation" then
@@ -155,12 +155,12 @@ function handle_world(cmd, args)
         minetest.set_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])},{name=args[4]})
     elseif cmd == "setBlocks" then
         local node = parse_node(args, 7)
-        x1 = math.min(-tonumber(args[1]),-tonumber(args[4]))
-        x2 = math.max(-tonumber(args[1]),-tonumber(args[4]))
-        y1 = math.min(tonumber(args[2]),tonumber(args[5]))
-        y2 = math.max(tonumber(args[2]),tonumber(args[5]))
-        z1 = math.min(tonumber(args[3]),tonumber(args[6]))
-        z2 = math.max(tonumber(args[3]),tonumber(args[6]))
+        local x1 = math.min(-tonumber(args[1]),-tonumber(args[4]))
+        local x2 = math.max(-tonumber(args[1]),-tonumber(args[4]))
+        local y1 = math.min(tonumber(args[2]),tonumber(args[5]))
+        local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
+        local z1 = math.min(tonumber(args[3]),tonumber(args[6]))
+        local z2 = math.max(tonumber(args[3]),tonumber(args[6]))
         for ycoord = y1,y2 do
           for xcoord = x1,x2 do
             for zcoord = z1,z2 do
@@ -170,12 +170,12 @@ function handle_world(cmd, args)
         end
     elseif cmd == "setNodes" then
         local node = {node = args[7]}
-        x1 = math.min(-tonumber(args[1]),-tonumber(args[4]))
-        x2 = math.max(-tonumber(args[1]),-tonumber(args[4]))
-        y1 = math.min(tonumber(args[2]),tonumber(args[5]))
-        y2 = math.max(tonumber(args[2]),tonumber(args[5]))
-        z1 = math.min(tonumber(args[3]),tonumber(args[6]))
-        z2 = math.max(tonumber(args[3]),tonumber(args[6]))
+        local x1 = math.min(-tonumber(args[1]),-tonumber(args[4]))
+        local x2 = math.max(-tonumber(args[1]),-tonumber(args[4]))
+        local y1 = math.min(tonumber(args[2]),tonumber(args[5]))
+        local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
+        local z1 = math.min(tonumber(args[3]),tonumber(args[6]))
+        local z2 = math.max(tonumber(args[3]),tonumber(args[6]))
         for ycoord = y1,y2 do
           for xcoord = x1,x2 do
             for zcoord = z1,z2 do
