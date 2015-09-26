@@ -50,9 +50,12 @@ function handle_entity(cmd, id, args)
     elseif cmd == "setPos" then
         entity:setpos({x=tonumber(args[1]), y=tonumber(args[2]), z=tonumber(args[3])})
     elseif cmd == "getPitch" then
-        return ""..(entity:getpitch() * 180 / math.pi)
+        return ""..(entity:get_look_pitch() * -180 / math.pi)
+    elseif cmd == "getRotation" then
+        return ""..((270 - entity:get_look_yaw() * 180 / math.pi) % 360)
     elseif cmd == "getDirection" then
-        return ""..(entity:getyaw() * 180 / math.pi)
+        local dir = entity:get_look_dir()
+        return ""..(dir.x)..","..(dir.y)..","..(dir.z)
     end
     return nil
 end
