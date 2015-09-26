@@ -28,13 +28,14 @@ script_running = false
 restrict_to_sword = true
 block_hits = {}
 chat_record = {}
-player_id_list = {}
+player_table = {}
+max_player_id = 0
+default_player_id = -1
 
 local settings = Settings(mypath .. path_separator .. "settings.conf")
 python_interpreter = settings:get("python")
 if not python_interpreter then python_interpreter = "python" end
 local local_only = settings:get_bool("local_only")
-print("Python ",python_interpreter)
 
 local server
 if local_only then
@@ -92,6 +93,28 @@ minetest.register_on_shutdown(function()
         socket_client_list[i]:close()
     end
     socket_client_list = {}
+    player_table = {}
+    max_player_id = 0
+    default_player_id = -1
+end)
+
+minetest.register_on_joinplayer(function(player)
+    minetest.log("action", "Hello, player "..player:get_player_name())
+    max_player_id = max_player_id + 1
+    player_table[max_player_id] = player
+    if default_player_id < 0 then default_player_id = max_player_id end
+end)
+
+minetest.register_on_leaveplayer(function(player)
+    minetest.log("action", "Goodbye, player "..player:get_player_name())
+    id = get_player_id(player)
+    if id then player_table[id] = nil end
+    if id == default_player_id then
+        default_player_id = max_player_id
+        for i,p in pairs(player_table) do
+          if p ~= nil and i < default_player_id then default_player_id = i end
+        end
+    end
 end)
 
 minetest.register_on_punchnode(function(pos, oldnode, puncher, pointed_thing)
@@ -100,13 +123,13 @@ minetest.register_on_punchnode(function(pos, oldnode, puncher, pointed_thing)
     if (puncher:is_player()) then
        local item = puncher:get_wielded_item()
        if not restrict_to_sword or (item and item:get_name():find("%:sword")) then
-          table.insert(block_hits, ""..(-pos.x)..","..pos.y..","..pos.z..",7,"..getentityid(puncher))
+          table.insert(block_hits, ""..(-pos.x)..","..pos.y..","..pos.z..",7,"..get_entity_id(puncher))
        end
     end
 end)
 
 minetest.register_on_chat_message(function(name, message)
-    local id = getplayeridbyname(name)
+    local id = get_player_id_by_name(name)
     if (message == "/py" or message == "/python") then
         if (script_running) then
            kill(script_window_id)
@@ -141,64 +164,40 @@ minetest.register_on_chat_message(function(name, message)
     end
 end)
 
-function getplayerid(player)
-    local max_id = 0
-    for id,p in pairs(player_id_list) do
-       if p.name == player.name then
-           return id
-       end
-       if id > max_id then max_id = id end
-    end
-
-    local id = max_id + 1
-    player_id_list[id] = player
-
-    return id
-end
-
-function getplayeridbyname(name)
-    for id,p in pairs(player_id_list) do
-       if p.name == name then
+function get_player_id(player)
+    local name = player:get_player_name()
+    for id,p in pairs(player_table) do
+       if p:get_player_name() == name then
            return id
        end
     end
-
-    local connected_players = minetest.get_connected_players()
-    for i = 1, #connected_players do
-       if connected_players[i]:get_player_name() == name then
-           return getplayerid(connected_players[i])
-       end
-    end
-
     return nil
 end
 
-function getplayer(id)
-    if id == -1 then
-        local connected_players = minetest.get_connected_players()
-        local player = connected_players[1]
-        getplayerid(player)
-        return player
+function get_player_id_by_name(name)
+    for id,p in pairs(player_table) do
+       if p:get_player_name() == name then
+           return id
+       end
     end
-    local p = player_id_list[id]
-    if p ~= nil then return p end
-    local connected_players = minetest.get_connected_players()
-    for i = 1, #connected_players do
-        getplayerid(connected_players[i])
-    end
-    return player_id_list[id]
+    return nil
 end
 
-function getentityid(entity)
+function get_entity_id(entity)
     if not entity:is_player() then
        return 0x7FFFFFFF
     else
-       return getplayerid(entity)
+       return get_player_id(entity)
     end
 end
 
 function handle_entity(cmd, id, args)
-    local entity = getplayer(id)
+    local entity
+    if id == nil then
+        entity = player_table[default_player_id]
+    else
+        entity = player_table[id]
+    end
     if entity == nil then
         return "fail"
     end
@@ -340,17 +339,22 @@ function handle_world(cmd, args)
         return "-1025"
     elseif cmd == "getPlayerId" then
         if #args > 0 then
-            local id = getplayeridbyname(args[1])
+            local id = get_player_id_by_name(args[1])
             if id == nil then
                return "fail"
             else
                return ""..id
             end
         else
-            return ""..getplayerid(minetest.get_connected_players()[1])
+            return ""..default_player_id
         end
     elseif cmd == "getPlayerIds" then
-        return "1"
+        local ids = {}
+        for id,_ in pairs(player_table) do
+            table.insert(ids, id)
+        end
+        table.sort(ids)
+        return table.concat(ids, "|")
     end
     return nil
 
@@ -400,7 +404,7 @@ function handle_command(line)
     if cmd:sub(1,6) == "world." then
         return handle_world(cmd:sub(7),args)
     elseif cmd:sub(1,7) == "player." then
-        return handle_entity(cmd:sub(8),-1,args)
+        return handle_entity(cmd:sub(8),nil,args)
     elseif cmd:sub(1,7) == "entity." then
         local player = tonumber(args[1])
         table.remove(args,1)
