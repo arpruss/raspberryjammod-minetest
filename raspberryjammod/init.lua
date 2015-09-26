@@ -23,37 +23,75 @@ package.cpath = package.cpath .. ";" .. mypath .. path_separator .. "?"
 local block = require("block")
 local socket = require("socket")
 
-local clientlist = {}
+local socket_client_list = {}
 script_running = false
 restrict_to_sword = true
 block_hits = {}
 chat_record = {}
-python_interpreter = "c:\\pypy\\pypy.exe"
+player_id_list = {}
 
-local server = socket.bind("*", 4711)
+local settings = Settings(mypath .. path_separator .. "settings.conf")
+python_interpreter = settings:get("python")
+if not python_interpreter then python_interpreter = "python" end
+local local_only = settings:get_bool("local_only")
+print("Python ",python_interpreter)
+
+local server
+if local_only then
+    server = socket.bind("127.0.0.1", 4711)
+else
+    server = socket.bind("*", 4711)
+end
 server:settimeout(0)
 
 minetest.register_globalstep(function(dtime)
     local newclient,err = server:accept()
     if not err then
        newclient:settimeout(0)
-       table.insert(clientlist, newclient)
-       minetest.log("action", "RJM client connected")
+       table.insert(socket_client_list, newclient)
+       minetest.log("action", "RJM socket client connected")
     end
-    for i = 1, #clientlist do
+    for i = 1, #socket_client_list do
        local err = false
        local line
+       local finished = false
+
        while not err do
-         line,err = clientlist[i]:receive()
+         line,err = socket_client_list[i]:receive()
          if err == "closed" then
-            table.remove(clientlist,i)
-            minetest.log("action", "RJM client disconnected")
+            table.remove(socket_client_list,i)
+            minetest.log("action", "RJM socket client disconnected")
+            finished = true
          elseif not err then
-            local response = handle_command(line)
-            if response then clientlist[i]:send(response.."\n") end
+            local status
+            status, err = pcall(function()
+                     local response = handle_command(line)
+                     if response then socket_client_list[i]:send(response.."\n") end
+                  end)
+            if not status then
+              socket_client_list[i]:close()
+              minetest.log("error", "Error "..err.." in command: RJM socket client disconnected")
+              finished = true
+              err = "handling"
+            end
          end
        end
+
+       if finished then break end
     end
+end)
+
+minetest.register_on_shutdown(function()
+    if (script_running) then
+       minetest.log("action", "Stopping scripts")
+       kill(script_window_id)
+       script_running = false
+    end
+    minetest.log("action", "RJM socket clients disconnected")
+    for i = 1, #socket_client_list do
+        socket_client_list[i]:close()
+    end
+    socket_client_list = {}
 end)
 
 minetest.register_on_punchnode(function(pos, oldnode, puncher, pointed_thing)
@@ -76,9 +114,10 @@ minetest.register_on_chat_message(function(name, message)
            script_running = false
         end
         return true
-    elseif (message:sub(1,4) == "/py " or message:sub(1,8) == "/python ") then
+    elseif (message:sub(1,4) == "/py " or message:sub(1,8) == "/python "
+           or message:sub(1,5) == "/apy " or message:sub(1,9) == "/apython ") then
 
-        if (script_running) then
+        if (script_running and message:sub(2,2) ~= "a") then
            kill(script_window_id)
            script_running = false
         end
@@ -102,27 +141,67 @@ minetest.register_on_chat_message(function(name, message)
     end
 end)
 
+function getplayerid(player)
+    local max_id = 0
+    for id,p in pairs(player_id_list) do
+       if p.name == player.name then
+           return id
+       end
+       if id > max_id then max_id = id end
+    end
+
+    local id = max_id + 1
+    player_id_list[id] = player
+
+    return id
+end
+
 function getplayeridbyname(name)
-    -- TODO: handle multiplayer
-    return 1
+    for id,p in pairs(player_id_list) do
+       if p.name == name then
+           return id
+       end
+    end
+
+    local connected_players = minetest.get_connected_players()
+    for i = 1, #connected_players do
+       if connected_players[i]:get_player_name() == name then
+           return getplayerid(connected_players[i])
+       end
+    end
+
+    return nil
 end
 
 function getplayer(id)
-    -- TODO: handle multiplayer
-    return minetest.get_connected_players()[1]
+    if id == -1 then
+        local connected_players = minetest.get_connected_players()
+        local player = connected_players[1]
+        getplayerid(player)
+        return player
+    end
+    local p = player_id_list[id]
+    if p ~= nil then return p end
+    local connected_players = minetest.get_connected_players()
+    for i = 1, #connected_players do
+        getplayerid(connected_players[i])
+    end
+    return player_id_list[id]
 end
 
 function getentityid(entity)
     if not entity:is_player() then
        return 0x7FFFFFFF
     else
-       -- TODO: handle multiplayer
-       return 1
+       return getplayerid(entity)
     end
 end
 
 function handle_entity(cmd, id, args)
     local entity = getplayer(id)
+    if entity == nil then
+        return "fail"
+    end
     if cmd == "getPos" then
         local pos = entity:getpos()
         return ""..(0.5-pos.x)..","..(pos.y+0.5)..","..(pos.z+0.5)
@@ -226,7 +305,7 @@ function handle_world(cmd, args)
     elseif cmd == "getNode" then
         return minetest.get_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])}).name
     elseif cmd == "getBlockWithData" or cmd == "getBlock" then
-        node = minetest.get_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])})
+        local node = minetest.get_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])})
         local id, meta
         if node == "ignore" then
             id = block.AIR
@@ -249,17 +328,27 @@ function handle_world(cmd, args)
         end
     elseif cmd == "getHeight" then
         -- TODO: Handle larger heights than 1024
+        -- TODO: Wait for emergence?
         local xcoord = -tonumber(args[1])
         local zcoord = tonumber(args[2])
         for ycoord = 1024,-1024,-1 do
-            name = minetest.get_node({x=xcoord,y=ycoord,z=zcoord}).name
-            if name ~= "ignore" and name ~= "air" then
+            local node = minetest.get_node_or_nil({x=xcoord,y=ycoord,z=zcoord})
+            if node and node.name ~= "air" then
                 return ""..ycoord
             end
         end
         return "-1025"
     elseif cmd == "getPlayerId" then
-        return "1"
+        if #args > 0 then
+            local id = getplayeridbyname(args[1])
+            if id == nil then
+               return "fail"
+            else
+               return ""..id
+            end
+        else
+            return ""..getplayerid(minetest.get_connected_players()[1])
+        end
     elseif cmd == "getPlayerIds" then
         return "1"
     end
@@ -311,7 +400,7 @@ function handle_command(line)
     if cmd:sub(1,6) == "world." then
         return handle_world(cmd:sub(7),args)
     elseif cmd:sub(1,7) == "player." then
-        return handle_entity(cmd:sub(8),1,args)
+        return handle_entity(cmd:sub(8),-1,args)
     elseif cmd:sub(1,7) == "entity." then
         local player = tonumber(args[1])
         table.remove(args,1)
@@ -324,3 +413,4 @@ function handle_command(line)
     return nil
 end
 
+-- TODO: test multiplayer functionality
