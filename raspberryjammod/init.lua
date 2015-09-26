@@ -85,14 +85,14 @@ function handle_entity(cmd, id, args)
     local entity = getplayer(id)
     if cmd == "getPos" then
         local pos = entity:getpos()
-        return ""..(-pos.x)..","..(pos.y+0.5)..","..(pos.z)
+        return ""..(0.5-pos.x)..","..(pos.y+0.5)..","..(pos.z+0.5)
     elseif cmd == "getTile" then
         local pos = entity:getpos()
-        return ""..math.floor(-pos.x)..","..math.floor(pos.y+0.5001)..","..math.floor(pos.z)
+        return ""..math.floor(0.5-pos.x)..","..math.floor(pos.y+0.5)..","..math.floor(pos.z+0.5)
     elseif cmd == "setPos" then
-        entity:setpos({x=-tonumber(args[1]), y=tonumber(args[2])-0.5, z=tonumber(args[3])})
+        entity:setpos({x=0.5-tonumber(args[1]), y=tonumber(args[2])-0.5, z=tonumber(args[3])-0.5})
     elseif cmd == "setTile" then
-        entity:setpos({x=-(0.5+tonumber(args[1])), y=tonumber(args[2])-0.5, z=0.5+tonumber(args[3])})
+        entity:setpos({x=-tonumber(args[1]), y=tonumber(args[2])-0.5, z=tonumber(args[3])})
     elseif cmd == "getPitch" then
         return ""..(entity:get_look_pitch() * -180 / math.pi)
     elseif cmd == "getRotation" then
