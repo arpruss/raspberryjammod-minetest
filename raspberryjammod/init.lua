@@ -15,6 +15,9 @@ local socket = require("socket")
 local server = socket.bind("*", 4711)
 server:settimeout(0)
 local clientlist = {}
+restrict_to_sword = 1
+block_hits = {}
+chat_record = {}
 
 minetest.register_globalstep(function(dtime)
     local newclient,err = server:accept()
@@ -39,10 +42,43 @@ minetest.register_globalstep(function(dtime)
     end
 end)
 
+minetest.register_on_punchnode(function(pos, oldnode, puncher, pointed_thing)
+    -- TODO: find a way to get right clicks
+    -- TODO: find a way to get clicked side
+    if (puncher:is_player()) then
+       local item = puncher:get_wielded_item()
+       if not restrict_to_sword or (item and item:get_name():find("%:sword")) then
+          table.insert(block_hits, ""..(-pos.x)..","..pos.y..","..pos.z..",7,"..getentityid(puncher))
+       end
+    end
+end)
+
+minetest.register_on_chat_message(function(name, message)
+    local id = getplayeridbyname(name)
+    if (message.sub(1,3) == "/py") then
+        print("TODO")
+    else
+        table.insert(chat_record, id .. "," .. message:gsub("%|", "&#124;"))
+    end
+end)
+
+function getplayeridbyname(name)
+    -- TODO: handle multiplayer
+    return 1
+end
 
 function getplayer(id)
     -- TODO: handle multiplayer
     return minetest.get_connected_players()[1]
+end
+
+function getentityid(entity)
+    if not entity:is_player() then
+       return 0x7FFFFFFF
+    else
+       -- TODO: handle multiplayer
+       return 1
+    end
 end
 
 function handle_entity(cmd, id, args)
@@ -191,6 +227,26 @@ function handle_world(cmd, args)
 
 end
 
+function handle_events(cmd, args)
+    if (cmd == "setting") then
+       if (args[1] == "restrict_to_sword") then
+           restrict_to_sword = tonumber(args[2])
+       end
+    elseif (cmd == "block.hits") then
+       local h = block_hits
+       block_hits = {}
+       return table.concat(h, "|")
+    elseif (cmd == "chat.posts") then
+       local c = chat_record
+       chat_record = {}
+       return table.concat(c, "|")
+    elseif (cmd == "clear") then
+       block_hits = {}
+       chat_record = {}
+    end
+    return nil
+end
+
 function handle_command(line)
     local cmd, argtext = string.match(line, "([^(]+)%((.*)%)")
     if not cmd then return end
@@ -206,12 +262,11 @@ function handle_command(line)
         local player = tonumber(args[1])
         table.remove(args,1)
         return handle_entity(cmd:sub(8),player,args)
+    elseif cmd:sub(1,7) == "events." then
+        return handle_events(cmd:sub(8),args)
     elseif cmd == "chat.post" then
         minetest.chat_send_all(argtext)
     end
     return nil
 end
 
--- TODO:
---  world: setting, getPlayerId (need multiplayer support), getPlayerIds (need multiplayer)
---  events: clear, block.hits, chat.posts, setting
