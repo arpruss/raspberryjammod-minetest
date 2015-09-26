@@ -1,4 +1,4 @@
--- print("HELLO "..debug.getinfo(1).source.sub(2))
+-- print("HELLO "..debug.getinfo(1).source:sub(2))
 
 -- Note: The x-coordinate is reversed in sign between minetest and minecraft,
 -- and the API compensates for this.
@@ -6,31 +6,39 @@
 
 local source = debug.getinfo(1).source:sub(2)
 -- Detect windows via backslashes in paths
-local is_windows = (nil ~= string.find(package.path..package.cpath..source, "%\\%?"))
-
+local mypath = minetest.get_modpath(minetest.get_current_modname())
+local is_windows = (nil ~= string.find(package.path..package.cpath..source..mypath, "%\\%?"))
+local path_separator
 if is_windows then
-     package.path = package.path .. ";" .. string.gsub(package.path, "bin%\\lua%\\%?%.lua", "mods\\raspberryjammod\\?.lua")
-     package.cpath = package.cpath .. ";" .. string.gsub(package.cpath, "bin%\\%?", "mods\\raspberryjammod\\?")
+   path_separator = "\\"
 else
-     package.path = package.path .. ";" .. string.gsub(package.path, "bin%/lua%/%?%.lua", "mods/raspberryjammod/?.lua")
-     package.cpath = package.cpath .. ";" .. string.gsub(package.cpath, "bin%/%?", "mods/raspberryjammod/?")
+   path_separator = "/"
 end
+
+local script_window_id = "minetest-rjm-python-script"
+
+package.path = package.path .. ";" .. mypath .. path_separator .. "?.lua"
+package.cpath = package.cpath .. ";" .. mypath .. path_separator .. "?"
 
 local block = require("block")
 local socket = require("socket")
-local server = socket.bind("*", 4711)
-server:settimeout(0)
+
 local clientlist = {}
-restrict_to_sword = 1
+script_running = false
+restrict_to_sword = true
 block_hits = {}
 chat_record = {}
+python_interpreter = "c:\\pypy\\pypy.exe"
+
+local server = socket.bind("*", 4711)
+server:settimeout(0)
 
 minetest.register_globalstep(function(dtime)
     local newclient,err = server:accept()
     if not err then
        newclient:settimeout(0)
        table.insert(clientlist, newclient)
-       print("RJM client connected")
+       minetest.log("action", "RJM client connected")
     end
     for i = 1, #clientlist do
        local err = false
@@ -39,7 +47,7 @@ minetest.register_globalstep(function(dtime)
          line,err = clientlist[i]:receive()
          if err == "closed" then
             table.remove(clientlist,i)
-            print("RJM client disconnected")
+            minetest.log("action", "RJM client disconnected")
          elseif not err then
             local response = handle_command(line)
             if response then clientlist[i]:send(response.."\n") end
@@ -61,10 +69,40 @@ end)
 
 minetest.register_on_chat_message(function(name, message)
     local id = getplayeridbyname(name)
-    if (message.sub(1,3) == "/py") then
-        print("TODO")
+    print("msg"..message)
+    if (message == "/py" or message == "/python") then
+        print("kil")
+        if (script_running) then
+           kill(script_window_id)
+           minetest.chat_send_all("Killed running scripts")
+           script_running = false
+        end
+        return true
+    elseif (message:sub(1,4) == "/py " or message:sub(1,8) == "/python ") then
+        print("msg py "..message)
+
+        if (script_running) then
+           kill(script_window_id)
+           script_running = false
+        end
+
+        local script, argtext = message:match("^[^ ]+ +([^ ]+) *(.*)")
+        if argtext:sub(#argtext) == " " then argtext = argtext:sub(1,#argtext - 1) end
+
+        if not script then return true end
+
+        if script:find("%.%.") then
+           minetest.chat_send_all("Sandbox violation in script")
+           return true
+        end
+
+        script_running = true
+        background_launch(script_window_id, '"' .. python_interpreter .. '" "' .. mypath .. path_separator .. "mcpipy" .. path_separator .. script .. ".py " .. argtext .. '"')
+        return true
     else
+        print("rec")
         table.insert(chat_record, id .. "," .. message:gsub("%|", "&#124;"))
+        return false
     end
 end)
 
@@ -236,7 +274,7 @@ end
 function handle_events(cmd, args)
     if (cmd == "setting") then
        if (args[1] == "restrict_to_sword") then
-           restrict_to_sword = tonumber(args[2])
+           restrict_to_sword = (0 ~= tonumber(args[2]))
        end
     elseif (cmd == "block.hits") then
        local h = block_hits
@@ -253,20 +291,26 @@ function handle_events(cmd, args)
     return nil
 end
 
-function background_launch(window_identifier, cmd, args)
+function background_launch(window_identifier, cmd)
+    -- TODO: non-Windows
     if not is_windows then return false end
-    local cmdline = 'start "' .. window_identifier .. ' /MIN "' .. cmd .. '" '
-    for i = 1,#args do
-        cmdline = cmdline .. '"' . args[i] . '"'
-    end
+    local cmdline = 'start "' .. window_identifier .. '" /MIN ' .. cmd
+    minetest.log("action", "launching ["..cmdline.."]")
     os.execute(cmdline)
 end
 
+function kill(window_identifier)
+    -- TODO: non-Windows
+    minetest.log('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
+    os.execute('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
+end
+
 function handle_command(line)
-    local cmd, argtext = string.match(line, "([^(]+)%((.*)%)")
+    local cmd, argtext = line:match("^([^(]+)%((.*)%)")
+    print(cmd,argtext)
     if not cmd then return end
     local args = {}
-    for arg in string.gmatch(argtext, "([^,]+)") do
+    for arg in argtext:gmatch("([^,]+)") do
         table.insert(args, arg)
     end
     if cmd:sub(1,6) == "world." then
