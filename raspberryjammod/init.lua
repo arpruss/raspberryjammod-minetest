@@ -69,9 +69,7 @@ end)
 
 minetest.register_on_chat_message(function(name, message)
     local id = getplayeridbyname(name)
-    print("msg"..message)
     if (message == "/py" or message == "/python") then
-        print("kil")
         if (script_running) then
            kill(script_window_id)
            minetest.chat_send_all("Killed running scripts")
@@ -79,7 +77,6 @@ minetest.register_on_chat_message(function(name, message)
         end
         return true
     elseif (message:sub(1,4) == "/py " or message:sub(1,8) == "/python ") then
-        print("msg py "..message)
 
         if (script_running) then
            kill(script_window_id)
@@ -100,7 +97,6 @@ minetest.register_on_chat_message(function(name, message)
         background_launch(script_window_id, '"' .. python_interpreter .. '" "' .. mypath .. path_separator .. "mcpipy" .. path_separator .. script .. ".py " .. argtext .. '"')
         return true
     else
-        print("rec")
         table.insert(chat_record, id .. "," .. message:gsub("%|", "&#124;"))
         return false
     end
@@ -307,7 +303,6 @@ end
 
 function handle_command(line)
     local cmd, argtext = line:match("^([^(]+)%((.*)%)")
-    print(cmd,argtext)
     if not cmd then return end
     local args = {}
     for arg in argtext:gmatch("([^,]+)") do
