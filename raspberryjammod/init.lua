@@ -253,6 +253,15 @@ function handle_events(cmd, args)
     return nil
 end
 
+function background_launch(window_identifier, cmd, args)
+    if not is_windows then return false end
+    local cmdline = 'start "' .. window_identifier .. ' /MIN "' .. cmd .. '" '
+    for i = 1,#args do
+        cmdline = cmdline .. '"' . args[i] . '"'
+    end
+    os.execute(cmdline)
+end
+
 function handle_command(line)
     local cmd, argtext = string.match(line, "([^(]+)%((.*)%)")
     if not cmd then return end
