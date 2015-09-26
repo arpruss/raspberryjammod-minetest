@@ -49,9 +49,14 @@ function handle_entity(cmd, id, args)
     local entity = getplayer(id)
     if cmd == "getPos" then
         local pos = entity:getpos()
-        return ""..(-pos.x)..","..(pos.y)..","..(pos.z)
+        return ""..(-pos.x)..","..(pos.y-0.5)..","..(pos.z)
+    elseif cmd == "getTile" then
+        local pos = entity:getpos()
+        return ""..math.floor(-pos.x)..","..math.floor(pos.y-0.4999)..","..math.floor(pos.z)
     elseif cmd == "setPos" then
-        entity:setpos({x=-tonumber(args[1]), y=tonumber(args[2]), z=tonumber(args[3])})
+        entity:setpos({x=-tonumber(args[1]), y=tonumber(args[2])+0.5, z=tonumber(args[3])})
+    elseif cmd == "setTile" then
+        entity:setpos({x=-(0.5+tonumber(args[1])), y=tonumber(args[2])+0.5, z=0.5+tonumber(args[3])})
     elseif cmd == "getPitch" then
         return ""..(entity:get_look_pitch() * -180 / math.pi)
     elseif cmd == "getRotation" then
@@ -109,9 +114,9 @@ end
 function handle_world(cmd, args)
     if cmd == "setBlock" then
         local node = parse_node(args, 4)
-        minetest.set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])},node)
+        minetest.set_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])},node)
     elseif cmd == "setNode" then
-        minetest.set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])},{name=args[4]})
+        minetest.set_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])},{name=args[4]})
     elseif cmd == "setBlocks" then
         local node = parse_node(args, 7)
         x1 = math.min(-tonumber(args[1]),-tonumber(args[4]))
@@ -209,5 +214,4 @@ end
 
 -- TODO:
 --  world: setting, getPlayerId (need multiplayer support), getPlayerIds (need multiplayer)
---  entity: getPitch (untested), getRotation (untested), getDirection, getTilePos, setTilePos
 --  events: clear, block.hits, chat.posts, setting
