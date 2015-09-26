@@ -1,3 +1,6 @@
+-- Note: The x-coordinate is reversed in sign between minetest and minecraft,
+-- and the API compensates for this.
+
 -- fix path --
 if string.find(package.path, "%\\%?") then
      package.path = package.path .. ";" .. string.gsub(package.path, "bin%\\lua%\\%?%.lua", "mods\\raspberryjammod\\?.lua")
@@ -46,16 +49,16 @@ function handle_entity(cmd, id, args)
     entity = getplayer(id)
     if cmd == "getPos" then
         local pos = entity:getpos()
-        return ""..(pos.x)..","..(pos.y)..","..(pos.z)
+        return ""..(-pos.x)..","..(pos.y)..","..(pos.z)
     elseif cmd == "setPos" then
-        entity:setpos({x=tonumber(args[1]), y=tonumber(args[2]), z=tonumber(args[3])})
+        entity:setpos({x=-tonumber(args[1]), y=tonumber(args[2]), z=tonumber(args[3])})
     elseif cmd == "getPitch" then
         return ""..(entity:get_look_pitch() * -180 / math.pi)
     elseif cmd == "getRotation" then
-        return ""..((270 - entity:get_look_yaw() * 180 / math.pi) % 360)
+        return ""..((90 - entity:get_look_yaw() * 180 / math.pi) % 360)
     elseif cmd == "getDirection" then
         local dir = entity:get_look_dir()
-        return ""..(dir.x)..","..(dir.y)..","..(dir.z)
+        return ""..(-dir.x)..","..(dir.y)..","..(dir.z)
     end
     return nil
 end
@@ -87,8 +90,8 @@ function handle_world(cmd, args)
         minetest.set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])},{name=args[4]})
     elseif cmd == "setBlocks" then
         local node = parse_node(args, 7)
-        x1 = math.min(tonumber(args[1]),tonumber(args[4]))
-        x2 = math.max(tonumber(args[1]),tonumber(args[4]))
+        x1 = math.min(-tonumber(args[1]),-tonumber(args[4]))
+        x2 = math.max(-tonumber(args[1]),-tonumber(args[4]))
         y1 = math.min(tonumber(args[2]),tonumber(args[5]))
         y2 = math.max(tonumber(args[2]),tonumber(args[5]))
         z1 = math.min(tonumber(args[3]),tonumber(args[6]))
@@ -102,8 +105,8 @@ function handle_world(cmd, args)
         end
     elseif cmd == "setNodes" then
         local node = {node = args[7]}
-        x1 = math.min(tonumber(args[1]),tonumber(args[4]))
-        x2 = math.max(tonumber(args[1]),tonumber(args[4]))
+        x1 = math.min(-tonumber(args[1]),-tonumber(args[4]))
+        x2 = math.max(-tonumber(args[1]),-tonumber(args[4]))
         y1 = math.min(tonumber(args[2]),tonumber(args[5]))
         y2 = math.max(tonumber(args[2]),tonumber(args[5]))
         z1 = math.min(tonumber(args[3]),tonumber(args[6]))
@@ -116,9 +119,9 @@ function handle_world(cmd, args)
           end
         end
     elseif cmd == "getNode" then
-        return minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])}).name
+        return minetest.get_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])}).name
     elseif cmd == "getBlockWithData" or cmd == "getBlock" then
-        node = minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])})
+        node = minetest.get_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])})
         local id, meta
         if node == "ignore" then
             id = block.AIR
@@ -141,7 +144,7 @@ function handle_world(cmd, args)
         end
     elseif cmd == "getHeight" then
         -- TODO: Handle larger heights than 1024
-        local xcoord = tonumber(args[1])
+        local xcoord = -tonumber(args[1])
         local zcoord = tonumber(args[2])
         for ycoord = 1024,-1024,-1 do
             name = minetest.get_node({x=xcoord,y=ycoord,z=zcoord}).name
