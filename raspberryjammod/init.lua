@@ -1,8 +1,14 @@
+-- print("HELLO "..debug.getinfo(1).source.sub(2))
+
 -- Note: The x-coordinate is reversed in sign between minetest and minecraft,
 -- and the API compensates for this.
 
--- fix path --
-if string.find(package.path, "%\\%?") then
+
+local source = debug.getinfo(1).source:sub(2)
+-- Detect windows via backslashes in paths
+local is_windows = (nil ~= string.find(package.path..package.cpath..source, "%\\%?"))
+
+if is_windows then
      package.path = package.path .. ";" .. string.gsub(package.path, "bin%\\lua%\\%?%.lua", "mods\\raspberryjammod\\?.lua")
      package.cpath = package.cpath .. ";" .. string.gsub(package.cpath, "bin%\\%?", "mods\\raspberryjammod\\?")
 else
