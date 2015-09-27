@@ -38,10 +38,27 @@ default_player_id = -1
 world_immutable = false
 
 local settings = Settings(mypath .. path_separator .. "settings.conf")
+local update_settings = false
 python_interpreter = settings:get("python")
-if not python_interpreter then python_interpreter = "python" end
-local local_only = settings:get_bool("local_only")
+if python_interpreter == nil then
+    python_interpreter = "python"
+    update_settings = true
+    settings:set("python", python_interpreter)
+end
+local local_only = settings:get_bool("restrict_to_local_connections")
+if local_only == nil then
+    local_only = false
+    update_settings = true
+    settings:set("restrict_to_local_connections", tostring(local_only))
+end
 local ws = settings:get_bool("support_websockets")
+if ws == nil then
+    ws = false
+    update_settings = true
+    settings:set("support_websockets", tostring(ws))
+end
+
+if update_settings then settings:write() end
 
 local remote_address
 if local_only then
