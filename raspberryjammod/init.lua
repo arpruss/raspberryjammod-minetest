@@ -53,7 +53,7 @@ if local_only == nil then
 end
 local ws = settings:get_bool("support_websockets")
 if ws == nil then
-    ws = false
+    ws = true
     update_settings = true
     settings:set("support_websockets", tostring(ws))
 end
