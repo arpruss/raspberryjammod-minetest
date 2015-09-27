@@ -8,7 +8,6 @@ local source = debug.getinfo(1).source:sub(2)
 -- Detect windows via backslashes in paths
 local mypath = minetest.get_modpath(minetest.get_current_modname())
 local is_windows = (nil ~= string.find(package.path..package.cpath..source..mypath, "%\\%?"))
-print(package.cpath)
 local path_separator
 if is_windows then
    path_separator = "\\"
@@ -41,6 +40,7 @@ local settings = Settings(mypath .. path_separator .. "settings.conf")
 python_interpreter = settings:get("python")
 if not python_interpreter then python_interpreter = "python" end
 local local_only = settings:get_bool("local_only")
+local ws = settings:get_bool("support_websockets")
 
 local server
 if local_only then
@@ -48,36 +48,65 @@ if local_only then
 else
     server = socket.bind("*", 4711)
 end
+
 server:setoption('tcp-nodelay',true)
 server:settimeout(0)
 
+local ws_server = nil
+
+if ws then
+    tools = require("tools")
+    if local_only then
+        ws_server = socket.bind("127.0.0.1", 14711)
+    else
+        ws_server = socket.bind("*", 14711)
+    end
+    ws_server:setoption('tcp-nodelay',true)
+    ws_server:settimeout(0)
+end
+
+
+
 minetest.register_globalstep(function(dtime)
-    local newclient,err = server:accept()
-    if not err then
-       newclient:settimeout(0)
-       table.insert(socket_client_list, newclient)
-       minetest.log("action", "RJM socket client connected")
+    local newclient,err
+
+    if server then
+        newclient,err = server:accept()
+        if not err then
+           newclient:settimeout(0)
+           table.insert(socket_client_list, 
+               {client=newclient,handler=safe_handle_command,read_mode="*l"})
+           minetest.log("action", "RJM socket client connected")
+        end
+    end
+    if ws_server then
+        newclient,err = ws_server:accept()
+        if not err then
+           newclient:settimeout(0)
+           table.insert(socket_client_list, 
+               {client=newclient,handler=handle_websocket_header,ws={},read_mode="*l"})
+           minetest.log("action", "RJM websocket client attempting handshake")
+        end
     end
     for i = 1, #socket_client_list do
-       local err = false
+       err = false
        local line
        local finished = false
 
        while not err do
-         line,err = socket_client_list[i]:receive()
+         local source = socket_client_list[i]
+         line,err = source.client:receive(source.read_mode)
          if err == "closed" then
             table.remove(socket_client_list,i)
             minetest.log("action", "RJM socket client disconnected")
             finished = true
          elseif not err then
-            local status
-            status, err = pcall(function()
-                     local response = handle_command(line)
-                     if response then socket_client_list[i]:send(response.."\n") end
-                  end)
-            if not status then
-              socket_client_list[i]:close()
-              minetest.log("error", "Error "..err.." in command: RJM socket client disconnected")
+            err = source:handler(line)
+            if err then
+              source.client:close()
+              if err ~= "closed" then
+                  minetest.log("error", "Error "..err.." in command: RJM socket client disconnected")
+              end
               finished = true
               err = "handling"
             end
@@ -96,7 +125,7 @@ minetest.register_on_shutdown(function()
     end
     minetest.log("action", "RJM socket clients disconnected")
     for i = 1, #socket_client_list do
-        socket_client_list[i]:close()
+        socket_client_list[i].client:close()
     end
     socket_client_list = {}
     player_table = {}
@@ -400,6 +429,14 @@ function kill(window_identifier)
     os.execute('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
 end
 
+function safe_handle_command(source,line)
+    local status, err = pcall(function()
+             local response = handle_command(line)
+             if response then source.client:send(response.."\n") end
+          end)
+    return err
+end
+
 function handle_command(line)
     local cmd, argtext = line:match("^([^(]+)%((.*)%)")
     if not cmd then return end
@@ -423,4 +460,170 @@ function handle_command(line)
     return nil
 end
 
+function complete_data(source,data)
+    local needed = tonumber(source.read_mode)
+    local have = data:len()
+
+    if source.ws.saved_data then
+        source.ws.saved_data = source.ws.saved_data .. data
+    else
+        source.ws.saved_data = data
+    end
+
+    if have >= needed then
+        local out = source.ws.saved_data
+        source.ws.saved_data = nil
+        return out
+    else
+        source.read_mode = ""..(needed-have)
+        return nil
+    end
+end
+
+function send_message(remote,opcode,data)
+    local out = string.char(0x80 + opcode)
+    local len = data:len()
+    if len > 65535 then
+        out = out .. string.char(127)
+        for i = 56,0,-8 do
+           out = out .. string.char(bit.band(bit.rshift(len, i),0xFF))
+        end
+    elseif len > 125 then
+        out = out .. string.char(126)
+        out = out .. string.char(bit.rshift(len, 8)) .. string.char(bit.band(len,0xFF))
+    else
+        out = out .. string.char(len)
+    end
+    out = out .. data
+    remote.client:send(out)
+    return nil
+end
+
+function handle_websocket_complete_payload(source,data)
+    if source.ws.opcode == 0x09 then
+       -- ping -> pong
+        send_message(source,0x0A,data)
+    elseif source.ws.opcode == 0x02 or source.ws.opcode == 0x01 then
+        local status, err = pcall(function()
+                 local response = handle_command(data)
+                 if response then send_message(source,0x01,response.."\n") end
+              end)
+        return err
+    end
+
+    return nil
+end
+
+function handle_websocket_payload(source,data)
+    data = complete_data(source,data)
+    if data == nil then return nil end
+    local mask = data:sub(1,4)
+    local decoded = ""
+    for i = 1,source.ws.payload_len do
+        decoded = decoded .. string.char(bit.bxor( mask:byte( ((i-1)%4) + 1 ), data:byte(4+i) ))
+    end
+
+    if source.ws.payload then
+        decoded = source.ws.payload .. decoded
+    end
+
+    source.read_mode = "2"
+    source.handler = handle_websocket_frame
+
+    if source.ws.frame_end then
+        source.ws.payload = nil
+        return handle_websocket_complete_payload(source,decoded)
+    else
+        source.ws.payload = decoded
+    end
+
+    return nil
+end
+
+function handle_websocket_payload_len(source,data)
+    data = complete_data(source,data)
+    if data == nil then return nil end
+    if source.read_mode == "1" then
+        source.ws.payload_len = data:byte(1)
+    elseif source.read_mode == "2" then
+        source.ws.payload_len = bit.lshift(data:byte(1),8)+data:byte(2)
+    elseif source.read_mode == "8" then
+        source.ws.payload_len =
+            bit.lshift(data:byte(1),56)+
+            bit.lshift(data:byte(2),48)+
+            bit.lshift(data:byte(3),40)+
+            bit.lshift(data:byte(4),32)+
+            bit.lshift(data:byte(5),24)+
+            bit.lshift(data:byte(6),16)+
+            bit.lshift(data:byte(7),8)+
+            data:byte(8)
+    end
+    source.read_mode = ""..(4+source.ws.payload_len)
+    source.handler = handle_websocket_payload
+    return nil
+end
+
+function handle_websocket_frame(source,data)
+    data = complete_data(source,data)
+    if data == nil then return nil end
+    local x = data:byte(1)
+    source.ws.frame_end = (0 ~= bit.band(0x80, x))
+    local opcode = bit.band(0xF, x)
+    if opcode == 0x08 then
+        return "closed"
+    end
+    if opcode ~= 0 then
+        source.ws.opcode = opcode
+    end
+    local y = data:byte(2)
+    source.ws.mask = (0 ~= bit.band(0x80, y))
+    if not source.ws.mask and opcode <= 0x02 then
+        return "unmasked data ("..opcode..")"
+    end
+    local payload_len = bit.band(y, 0x7F)
+    if payload_len == 126 then
+        source.handler = handle_websocket_payload_len
+        source.read_mode = "2"
+    elseif payload_len == 127 then
+        source.handler = handle_websocket_payload_len
+        source.read_mode = "8"
+    else
+        source.read_mode = "1"
+        return handle_websocket_payload_len(source,string.char(payload_len))
+    end
+    return nil
+end
+
+function handle_websocket_header(source,line)
+    if line:find("^Upgrade%: +websocket") then
+        source.ws.isWebsocket = true
+        return nil
+    end
+
+    if not source.ws.key then
+        source.ws.key = line:match("^Sec%-WebSocket%-Key%: +([=+/0-9A-Za-z]+)")
+    end
+
+    if line == "" then
+        if source.ws.isWebsocket and source.ws.key then
+            local new_key = tools.base64.encode(tools.sha1(source.ws.key .. '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'))
+            source.ws = {frame=""}
+            local response = "HTTP/1.1 101 Switching Protocols\r\n"..
+                             "Upgrade: websocket\r\n"..
+                             "Connection: Upgrade\r\n"..
+                             "Sec-WebSocket-Accept: "..new_key.."\r\n\r\n";
+            source.client:send(response)
+            source.read_mode = "2"
+            source.handler = handle_websocket_frame
+            minetest.log("action","Websocket handshake")
+            return nil
+        else
+            return "invalid websocket request"
+        end
+    end
+
+    return nil
+end
+
 -- TODO: test multiplayer functionality
+
