@@ -8,6 +8,7 @@ local source = debug.getinfo(1).source:sub(2)
 -- Detect windows via backslashes in paths
 local mypath = minetest.get_modpath(minetest.get_current_modname())
 local is_windows = (nil ~= string.find(package.path..package.cpath..source..mypath, "%\\%?"))
+print(package.cpath)
 local path_separator
 if is_windows then
    path_separator = "\\"
@@ -18,7 +19,11 @@ end
 local script_window_id = "minetest-rjm-python-script"
 
 package.path = package.path .. ";" .. mypath .. path_separator .. "?.lua"
-package.cpath = package.cpath .. ";" .. mypath .. path_separator .. "?"
+if is_windows then
+   package.cpath = package.cpath .. ";" .. mypath .. path_separator .. "?.dll"
+else
+   package.cpath = package.cpath .. ";" .. mypath .. path_separator .. "?.so"
+end
 
 local block = require("block")
 local socket = require("socket")
@@ -43,6 +48,7 @@ if local_only then
 else
     server = socket.bind("*", 4711)
 end
+server:setoption('tcp-nodelay',true)
 server:settimeout(0)
 
 minetest.register_globalstep(function(dtime)
