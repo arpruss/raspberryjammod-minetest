@@ -200,12 +200,12 @@ block.BLOCK[block.IRON_BLOCK]={name="default:steelblock"}
 --block.BLOCK[block.STONE_SLAB_DOUBLE]={name="default:"}
 --block.BLOCK[block.STONE_SLAB]={name="default:"}
 block.BLOCK[block.BRICK_BLOCK]={name="default:brick"}
---block.BLOCK[block.TNT]={name="default:"}
+block.BLOCK[block.TNT]={name="tnt:tnt"}
 block.BLOCK[block.BOOKSHELF]={name="default:bookshelf"}
 block.BLOCK[block.MOSS_STONE]={name="default:mossycobble"}
 block.BLOCK[block.OBSIDIAN]={name="default:obsidian"}
 block.BLOCK[block.TORCH]={name="default:torch"}
---block.BLOCK[block.FIRE]={name="default:"}
+block.BLOCK[block.FIRE]={name="fire:basic_flame"}
 --block.BLOCK[block.STAIRS_WOOD]={name="default:"}
 block.BLOCK[block.CHEST]={name="default:chest"}
 block.BLOCK[block.DIAMOND_ORE]={name="default:stone_with_diamond"}
