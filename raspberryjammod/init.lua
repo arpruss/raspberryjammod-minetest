@@ -162,7 +162,7 @@ minetest.register_on_chat_message(function(name, message)
         end
 
         script_running = true
-        background_launch(script_window_id, '"' .. python_interpreter .. '" "' .. mypath .. path_separator .. "mcpipy" .. path_separator .. script .. ".py " .. argtext .. '"')
+        background_launch(script_window_id, '"' .. python_interpreter .. '" "' .. mypath .. path_separator .. "mcpipy" .. path_separator .. script .. '.py" ' .. argtext)
         return true
     else
         table.insert(chat_record, id .. "," .. message:gsub("%|", "&#124;"))
