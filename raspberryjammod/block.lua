@@ -191,7 +191,7 @@ block.BLOCK[block.SANDSTONE]={name="default:sandstone"}
 -- block.BLOCK[block.COBWEB]={name="default:"}
 block.BLOCK[block.GRASS_TALL]={name="default:junglegrass"}
 block.BLOCK[block.WOOL]={name="wool:white"}
---block.BLOCK[block.FLOWER_YELLOW]={name="default:"}
+block.BLOCK[block.FLOWER_YELLOW]={name="flowers:dandelion_yellow"}
 --block.BLOCK[block.FLOWER_CYAN]={name="default:"}
 --block.BLOCK[block.MUSHROOM_BROWN]={name="default:"}
 --block.BLOCK[block.MUSHROOM_RED]={name="default:"}
@@ -206,7 +206,7 @@ block.BLOCK[block.MOSS_STONE]={name="default:mossycobble"}
 block.BLOCK[block.OBSIDIAN]={name="default:obsidian"}
 block.BLOCK[block.TORCH]={name="default:torch"}
 block.BLOCK[block.FIRE]={name="fire:basic_flame"}
---block.BLOCK[block.STAIRS_WOOD]={name="default:"}
+block.BLOCK[block.STAIRS_WOOD]={name="stairs:stair_wood"}
 block.BLOCK[block.CHEST]={name="default:chest"}
 block.BLOCK[block.DIAMOND_ORE]={name="default:stone_with_diamond"}
 block.BLOCK[block.DIAMOND_BLOCK]={name="default:diamondblock"}
@@ -214,10 +214,10 @@ block.BLOCK[block.DIAMOND_BLOCK]={name="default:diamondblock"}
 --block.BLOCK[block.FARMLAND]={name="default:"}
 --block.BLOCK[block.FURNACE_INACTIVE]={name="default:"}
 --block.BLOCK[block.FURNACE_ACTIVE]={name="default:"}
---block.BLOCK[block.DOOR_WOOD]={name="default:"}
+block.BLOCK[block.DOOR_WOOD]={name="doors:door_wood"}
 block.BLOCK[block.LADDER]={name="default:ladder"}
---block.BLOCK[block.STAIRS_COBBLESTONE]={name="default:"}
---block.BLOCK[block.DOOR_IRON]={name="default:"}
+block.BLOCK[block.STAIRS_COBBLESTONE]={name="stairs:cobble"}
+block.BLOCK[block.DOOR_IRON]={name="doors:door_steel"}
 block.BLOCK[block.REDSTONE_ORE]={name="wool:red"} -- fix
 --block.BLOCK[block.STONE_BUTTON]={name="default:"}
 block.BLOCK[block.SNOW]={name="default:snow"}
