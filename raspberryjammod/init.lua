@@ -35,6 +35,7 @@ chat_record = {}
 player_table = {}
 max_player_id = 0
 default_player_id = -1
+world_immutable = false
 
 local settings = Settings(mypath .. path_separator .. "settings.conf")
 python_interpreter = settings:get("python")
@@ -42,13 +43,14 @@ if not python_interpreter then python_interpreter = "python" end
 local local_only = settings:get_bool("local_only")
 local ws = settings:get_bool("support_websockets")
 
-local server
+local remote_address
 if local_only then
-    server = socket.bind("127.0.0.1", 4711)
+    remote_address = "127.0.0.1"
 else
-    server = socket.bind("*", 4711)
+    remote_address = "*"
 end
 
+local server = socket.bind(remote_address, 4711)
 server:setoption('tcp-nodelay',true)
 server:settimeout(0)
 
@@ -56,15 +58,10 @@ local ws_server = nil
 
 if ws then
     tools = require("tools")
-    if local_only then
-        ws_server = socket.bind("127.0.0.1", 14711)
-    else
-        ws_server = socket.bind("*", 14711)
-    end
+    ws_server = socket.bind(remote_address, 14711)
     ws_server:setoption('tcp-nodelay',true)
     ws_server:settimeout(0)
 end
-
 
 
 minetest.register_globalstep(function(dtime)
@@ -74,7 +71,7 @@ minetest.register_globalstep(function(dtime)
         newclient,err = server:accept()
         if not err then
            newclient:settimeout(0)
-           table.insert(socket_client_list, 
+           table.insert(socket_client_list,
                {client=newclient,handler=safe_handle_command,read_mode="*l"})
            minetest.log("action", "RJM socket client connected")
         end
@@ -116,6 +113,11 @@ minetest.register_globalstep(function(dtime)
        if finished then break end
     end
 end)
+
+local old_is_protected = minetest.is_protected
+function minetest.is_protected(pos, name)
+    return world_immutable or old_is_protected(pos, name)
+end
 
 minetest.register_on_shutdown(function()
     if (script_running) then
@@ -390,6 +392,10 @@ function handle_world(cmd, args)
         end
         table.sort(ids)
         return table.concat(ids, "|")
+    elseif cmd == "setting" then
+        if args[1] == "world_immutable" then
+            world_immutable = (0 ~= tonumber(args[2]))
+        end
     end
     return nil
 
