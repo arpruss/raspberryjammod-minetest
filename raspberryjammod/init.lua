@@ -315,7 +315,7 @@ function parse_node(args, start)
     if node == nil then
         node = block.BLOCK[bit.band(nodenum,0xFFF)]
         if not node then
-            node = block.BLOCK[STONE]
+            node = block.BLOCK[block.STONE]
         end
     end
     return node
