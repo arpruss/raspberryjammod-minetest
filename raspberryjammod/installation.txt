@@ -1,0 +1,2 @@
+In socket/core.dll is a win32 Microsoft Visual C build from luasockets. Replace it with 
+something that fits your build of Minetest if you need to.
