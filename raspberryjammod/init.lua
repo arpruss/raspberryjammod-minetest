@@ -75,6 +75,7 @@ local ws_server = nil
 
 if ws then
     tools = require("tools")
+    base64 = require("base64")
     ws_server = socket.bind(remote_address, 14711)
     ws_server:setoption('tcp-nodelay',true)
     ws_server:settimeout(0)
@@ -97,7 +98,7 @@ minetest.register_globalstep(function(dtime)
         newclient,err = ws_server:accept()
         if not err then
            newclient:settimeout(0)
-           table.insert(socket_client_list, 
+           table.insert(socket_client_list,
                {client=newclient,handler=handle_websocket_header,ws={},read_mode="*l"})
            minetest.log("action", "RJM websocket client attempting handshake")
         end
@@ -118,6 +119,7 @@ minetest.register_globalstep(function(dtime)
             err = source:handler(line)
             if err then
               source.client:close()
+              table.remove(socket_client_list,i)
               if err ~= "closed" then
                   minetest.log("error", "Error "..err.." in command: RJM socket client disconnected")
               end
@@ -590,9 +592,12 @@ function handle_websocket_frame(source,data)
     data = complete_data(source,data)
     if data == nil then return nil end
     local x = data:byte(1)
+    --print(string.format("frame %02x %02x",data:byte(1),data:byte(2)))
     source.ws.frame_end = (0 ~= bit.band(0x80, x))
     local opcode = bit.band(0xF, x)
     if opcode == 0x08 then
+        --print("closing")
+        source.client:close()
         return "closed"
     end
     if opcode ~= 0 then
@@ -629,7 +634,7 @@ function handle_websocket_header(source,line)
 
     if line == "" then
         if source.ws.isWebsocket and source.ws.key then
-            local new_key = tools.base64.encode(tools.sha1(source.ws.key .. '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'))
+            local new_key = base64.encode(tools.sha1(source.ws.key .. '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'))
             source.ws = {}
             local response = "HTTP/1.1 101 Switching Protocols\r\n"..
                              "Upgrade: websocket\r\n"..

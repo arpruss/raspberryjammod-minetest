@@ -157,10 +157,10 @@ local sha1_wiki = function(msg)
   return write_int32(h0)..write_int32(h1)..write_int32(h2)..write_int32(h3)..write_int32(h4)
 end
 
-local base64_encode = function(data)
-  local mime = require'mime'
-  return (mime.b64(data))
-end
+--local base64_encode = function(data)
+--  local mime = require'mime'
+--  return (mime.b64(data))
+--end
 
 local DEFAULT_PORTS = {ws = 80, wss = 443}
 
