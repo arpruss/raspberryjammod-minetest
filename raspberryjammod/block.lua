@@ -192,7 +192,7 @@ block.BLOCK[block.SANDSTONE]={name="default:sandstone"}
 block.BLOCK[block.GRASS_TALL]={name="default:junglegrass"}
 block.BLOCK[block.WOOL]={name="wool:white"}
 block.BLOCK[block.FLOWER_YELLOW]={name="flowers:dandelion_yellow"}
---block.BLOCK[block.FLOWER_CYAN]={name="default:"}
+block.BLOCK[block.FLOWER_CYAN]={name="flowers:geranium"}
 block.BLOCK[block.MUSHROOM_BROWN]={name="flowers:mushroom_brown"}
 block.BLOCK[block.MUSHROOM_RED]={name="flowers:mushroom_red"}
 block.BLOCK[block.GOLD_BLOCK]={name="default:goldblock"}
@@ -211,9 +211,9 @@ block.BLOCK[block.CHEST]={name="default:chest"}
 block.BLOCK[block.DIAMOND_ORE]={name="default:stone_with_diamond"}
 block.BLOCK[block.DIAMOND_BLOCK]={name="default:diamondblock"}
 --block.BLOCK[block.CRAFTING_TABLE]={name="default:"}
---block.BLOCK[block.FARMLAND]={name="default:"}
---block.BLOCK[block.FURNACE_INACTIVE]={name="default:"}
---block.BLOCK[block.FURNACE_ACTIVE]={name="default:"}
+block.BLOCK[block.FARMLAND]={name="farming:soil"}
+block.BLOCK[block.FURNACE_INACTIVE]={name="default:furnace"}
+block.BLOCK[block.FURNACE_ACTIVE]={name="default:furnace_active"}
 block.BLOCK[block.DOOR_WOOD]={name="doors:door_wood"}
 block.BLOCK[block.LADDER]={name="default:ladder"}
 block.BLOCK[block.STAIRS_COBBLESTONE]={name="stairs:cobble"}
@@ -225,7 +225,7 @@ block.BLOCK[block.ICE]={name="default:ice"}
 block.BLOCK[block.SNOW_BLOCK]={name="default:snowblock"}
 block.BLOCK[block.CACTUS]={name="default:cactus"}
 block.BLOCK[block.CLAY]={name="default:clay"}
---block.BLOCK[block.SUGAR_CANE]={name="default:"}
+block.BLOCK[block.SUGAR_CANE]={name="farming:wheat"} -- fix
 block.BLOCK[block.FENCE]={name="default:fence_wood"}
 block.BLOCK[block.GLOWSTONE_BLOCK]={name="default:meselamp"} -- fix
 --block.BLOCK[block.BEDROCK_INVISIBLE]={name="default:"}
@@ -243,11 +243,11 @@ block.BLOCK[block.CARPET]={name="wool:white"} -- fix
 block.BLOCK[block.COAL_BLOCK]={name="default:coalblock"}
 --block.BLOCK[block.REDSTONE_LAMP_INACTIVE]={name="default:"}
 block.BLOCK[block.REDSTONE_LAMP_ACTIVE]={name="default:meselamp"}
---block.BLOCK[block.SUNFLOWER]={name="default:"}
+block.BLOCK[block.SUNFLOWER]={name="flowers:tulip"}
 block.BLOCK[block.LILAC]={name="flowers:viola"}
 block.BLOCK[block.DOUBLE_TALLGRASS]={name="default:grass_2"} --fix
 --block.BLOCK[block.LARGE_FERN]={name="default:"}
---block.BLOCK[block.ROSE_BUSH]={name="default:"}
+block.BLOCK[block.ROSE_BUSH]={name="flowers:rose"}
 --block.BLOCK[block.PEONY]={name="default:"}
 block.BLOCK[block.WOOL_WHITE]={name="wool:white"}
 block.BLOCK[block.WOOL_ORANGE]={name="wool:orange"}
