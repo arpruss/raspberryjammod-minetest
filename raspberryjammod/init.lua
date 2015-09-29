@@ -164,7 +164,7 @@ end)
 
 minetest.register_on_leaveplayer(function(player)
     minetest.log("action", "Goodbye, player "..player:get_player_name())
-    id = get_player_id(player)
+    local id = get_player_id(player)
     if id then player_table[id] = nil end
     if id == default_player_id then
         default_player_id = max_player_id
@@ -185,6 +185,15 @@ minetest.register_on_punchnode(function(pos, oldnode, puncher, pointed_thing)
     end
 end)
 
+minetest.register_chatcommand("top", 
+	{params="" ,
+	description="Move player on top of everything.",
+	func = function(name, args)
+		local player = minetest.get_player_by_name(name)
+		local pos = player:getpos()
+		pos.y = get_height(pos.x, pos.z)+1.5
+		player:setpos(pos)
+	end})
 minetest.register_chatcommand("py", 
 	{params="[<script> [<args>]]" ,
 	description="Run python script in raspberryjammod/mcpipy directory, killing any previous script",
@@ -209,6 +218,8 @@ function python(name, args, kill_script)
 	   script_running = false
 	end
 
+	if args == "" then return end
+	
 	local script, argtext = args:match("^([^ ]+) *(.*)")
 	if argtext:sub(#argtext) == " " then argtext = argtext:sub(1,#argtext - 1) end
 
@@ -331,6 +342,18 @@ function parse_node(args, start)
     return node
 end
 
+function get_height(x, z)
+	-- TODO: Handle larger heights than 1024
+	-- TODO: Wait for emergence?
+	for ycoord = 1024,-1024,-1 do
+		local node = minetest.get_node_or_nil({x=x,y=ycoord,z=z})
+		if node and node.name ~= "air" then
+			return ycoord
+		end
+	end
+	return -1025
+end
+
 function handle_world(cmd, args)
     if cmd == "setBlock" then
         local node = parse_node(args, 4)
@@ -392,17 +415,7 @@ function handle_world(cmd, args)
             return ""..id..","..meta
         end
     elseif cmd == "getHeight" then
-        -- TODO: Handle larger heights than 1024
-        -- TODO: Wait for emergence?
-        local xcoord = -tonumber(args[1])
-        local zcoord = tonumber(args[2])
-        for ycoord = 1024,-1024,-1 do
-            local node = minetest.get_node_or_nil({x=xcoord,y=ycoord,z=zcoord})
-            if node and node.name ~= "air" then
-                return ""..ycoord
-            end
-        end
-        return "-1025"
+	    return tonumber(get_height(-tonumber(args[1]),tonumber(args[2])))
     elseif cmd == "getPlayerId" then
         if #args > 0 then
             local id = get_player_id_by_name(args[1])
