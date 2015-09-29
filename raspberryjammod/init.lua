@@ -185,40 +185,49 @@ minetest.register_on_punchnode(function(pos, oldnode, puncher, pointed_thing)
     end
 end)
 
+minetest.register_chatcommand("py", 
+	{params="[<script> [<args>]]" ,
+	description="Run python script in raspberryjammod/mcpipy directory, killing any previous script",
+	func = function(name, args) python(name, args, true) end })
+minetest.register_chatcommand("python", 
+	{params="[<script> [<args>]]" ,
+	description="Run python script in raspberryjammod/mcpipy directory, killing any previous script",
+	func = function(name, args) python(name, args, true) end })
+minetest.register_chatcommand("apy", 
+	{params="[<script> [<args>]]" ,
+	description="Run python script in raspberryjammod/mcpipy directory, without killing any previous script",
+	func = function(name, args) python(name, args, true) end })
+minetest.register_chatcommand("apython", 
+	{params="[<script> [<args>]]" ,
+	description="Run python script in raspberryjammod/mcpipy directory, without killing any previous script",
+	func = function(name, args) python(name, args, true) end })
+
+function python(name, args, kill_script)
+	if (kill_script and script_running) then
+	   kill(script_window_id)
+	   minetest.chat_send_all("Killed running scripts")
+	   script_running = false
+	end
+
+	local script, argtext = args:match("^([^ ]+) *(.*)")
+	if argtext:sub(#argtext) == " " then argtext = argtext:sub(1,#argtext - 1) end
+
+	if not script then return true end
+
+	if script:find("%.%.") then
+	   minetest.chat_send_all("Sandbox violation in script")
+	   return true
+	end
+
+	script_running = true
+	background_launch(script_window_id, '"' .. python_interpreter .. '" "' .. mypath .. path_separator .. "mcpipy" .. path_separator .. script .. '.py" ' .. argtext)
+    return true
+ end
+
 minetest.register_on_chat_message(function(name, message)
     local id = get_player_id_by_name(name)
-    if (message == "/py" or message == "/python") then
-        if (script_running) then
-           kill(script_window_id)
-           minetest.chat_send_all("Killed running scripts")
-           script_running = false
-        end
-        return true
-    elseif (message:sub(1,4) == "/py " or message:sub(1,8) == "/python "
-           or message:sub(1,5) == "/apy " or message:sub(1,9) == "/apython ") then
-
-        if (script_running and message:sub(2,2) ~= "a") then
-           kill(script_window_id)
-           script_running = false
-        end
-
-        local script, argtext = message:match("^[^ ]+ +([^ ]+) *(.*)")
-        if argtext:sub(#argtext) == " " then argtext = argtext:sub(1,#argtext - 1) end
-
-        if not script then return true end
-
-        if script:find("%.%.") then
-           minetest.chat_send_all("Sandbox violation in script")
-           return true
-        end
-
-        script_running = true
-        background_launch(script_window_id, '"' .. python_interpreter .. '" "' .. mypath .. path_separator .. "mcpipy" .. path_separator .. script .. '.py" ' .. argtext)
-        return true
-    else
-        table.insert(chat_record, id .. "," .. message:gsub("%|", "&#124;"))
-        return false
-    end
+    table.insert(chat_record, id .. "," .. message:gsub("%|", "&#124;"))
+    return false
 end)
 
 function get_player_id(player)
