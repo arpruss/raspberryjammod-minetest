@@ -1,5 +1,5 @@
--- print("HELLO "..debug.getinfo(1).source:sub(2))
-
+-- TODO: test multiplayer functionality
+--
 -- Note: The x-coordinate is reversed in sign between minetest and minecraft,
 -- and the API compensates for this.
 
@@ -27,12 +27,13 @@ end
 local block = require("block")
 local socket = require("socket")
 
+local block_hits = {}
+local chat_record = {}
+local player_table = {}
 local socket_client_list = {}
+
 script_running = false
 restrict_to_sword = true
-block_hits = {}
-chat_record = {}
-player_table = {}
 max_player_id = 0
 default_player_id = -1
 world_immutable = false
@@ -652,6 +653,4 @@ function handle_websocket_header(source,line)
 
     return nil
 end
-
--- TODO: test multiplayer functionality
 
