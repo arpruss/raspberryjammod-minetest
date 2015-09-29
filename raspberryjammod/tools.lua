@@ -189,9 +189,9 @@ end
 
 return {
   sha1 = sha1_crypto or sha1_wiki,
-  base64 = {
-    encode = base64_encode
-  },
+--  base64 = {
+--    encode = base64_encode
+--  },
   parse_url = parse_url,
   generate_key = generate_key,
   read_int8 = read_int8,

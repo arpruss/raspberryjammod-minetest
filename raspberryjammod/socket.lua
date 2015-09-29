@@ -10,7 +10,12 @@
 local base = _G
 local string = require("string")
 local math = require("math")
-local socket = require("socket.core")
+local socket
+local status,err = pcall(function() socket = require("socket.core") end)
+if not status then
+   socket = require("socket.cx64")
+end
+
 module("socket")
 
 -----------------------------------------------------------------------------
