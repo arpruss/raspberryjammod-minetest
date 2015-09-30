@@ -71,10 +71,14 @@ block.FENCE               = block.Block(85)
 block.GLOWSTONE_BLOCK     = block.Block(89)
 block.BEDROCK_INVISIBLE   = block.Block(95)
 block.STAINED_GLASS =       block.Block(95)
+block.TRAPDOOR            = block.Block(96)
 block.STONE_BRICK         = block.Block(98)
 block.GLASS_PANE          = block.Block(102)
 block.MELON               = block.Block(103)
 block.FENCE_GATE          = block.Block(107)
+block.WATERLILY           = block.Block(111)
+block.WOOD_SLAB_DOUBLE    = block.Block(125)
+block.WOOD_SLAB           = block.Block(126)
 block.WOOD_BUTTON         = block.Block(143)
 block.REDSTONE_BLOCK      = block.Block(152)
 block.QUARTZ_BLOCK        = block.Block(155)
@@ -206,6 +210,7 @@ block.BLOCK[block.SANDSTONE]={name="default:sandstone"}
 -- block.BLOCK[block.COBWEB]={name="default:"}
 block.BLOCK[block.GRASS_TALL]={name="default:junglegrass"}
 block.BLOCK[block.WOOL]={name="wool:white"}
+block.BLOCK[block.WATERLILY]={name="flowers:dandelion_yellow"} --fix
 block.BLOCK[block.FLOWER_YELLOW]={name="flowers:dandelion_yellow"}
 block.BLOCK[block.FLOWER_CYAN]={name="flowers:geranium"}
 block.BLOCK[block.MUSHROOM_BROWN]={name="flowers:mushroom_brown"}
@@ -245,9 +250,12 @@ block.BLOCK[block.FENCE]={name="default:fence_wood"}
 block.BLOCK[block.GLOWSTONE_BLOCK]={name="default:meselamp"} -- fix
 --block.BLOCK[block.BEDROCK_INVISIBLE]={name="default:"}
 block.BLOCK[block.STAINED_GLASS]={name="default:glass"} -- fix
+block.BLOCK[block.TRAPDOOR]={name="doors:trapdoor"} -- fix
 block.BLOCK[block.STONE_BRICK]={name="default:stonebrick"}
 block.BLOCK[block.GLASS_PANE]={name="default:glass"} -- fix
 --block.BLOCK[block.MELON]={name="default:"}
+block.BLOCK[block.WOOD_SLAB_DOUBLE]={name="default:wood"} --fix
+block.BLOCK[block.WOOD_SLAB]={name="default:wood"} --fix
 --block.BLOCK[block.FENCE_GATE]={name="default:"}
 --block.BLOCK[block.WOOD_BUTTON]={name="default:"}
 block.BLOCK[block.REDSTONE_BLOCK]={name="wool:red"} -- fix
@@ -327,11 +335,16 @@ block.BLOCK[block.LEAVES_SPRUCE_PERMANENT_CD]={name="default:pine_needles", para
 block.BLOCK[block.LEAVES_BIRCH_PERMANENT_CD]={name="default:leaves", param2=1}
 block.BLOCK[block.LEAVES_JUNGLE_PERMANENT_CD]={name="default:jungleleaves", param2=1}
 block.BLOCK[block.LEAVES2] = {name="default:leaves"}
-block.LEAVES_ACACIA_DECAYABLE = {name="default:acacia_leaves"}
---block.LEAVES_DARK_OAK_DECAYABLE =
-block.LEAVES_ACACIA_PERMANENT = {name="default:acacia_leaves", param2=1}
-block.LEAVES_DARK_OAK_PERMANENT = {name="default:leaves", param2=1}
-block.LEAVES_ACACIA_PERMANENT_CD = {name="default:acacia_leaves", param2=1}
-block.LEAVES_DARK_OAK_PERMANENT_CD = {name="default:leaves", param2=1}
+block.BLOCK[block.LEAVES_ACACIA_DECAYABLE] = {name="default:acacia_leaves"}
+--block.BLOCK[block.LEAVES_DARK_OAK_DECAYABLE] =
+block.BLOCK[block.LEAVES_ACACIA_PERMANENT] = {name="default:acacia_leaves", param2=1}
+block.BLOCK[block.LEAVES_DARK_OAK_PERMANENT] = {name="default:leaves", param2=1}
+block.BLOCK[block.LEAVES_ACACIA_PERMANENT_CD] = {name="default:acacia_leaves", param2=1}
+block.BLOCK[block.LEAVES_DARK_OAK_PERMANENT_CD] = {name="default:leaves", param2=1}
+
+block.BLOCK[block.Block(228)] = {name="air"}
+block.BLOCK[block.Block(229)] = {name="air"}
+block.BLOCK[block.Block(236)] = {name="air"}
+block.BLOCK[block.Block(254)] = {name="air"}
 
 return block

@@ -336,7 +336,8 @@ function parse_node(args, start)
     if node == nil then
         node = block.BLOCK[bit.band(nodenum,0xFFF)]
         if not node then
-            node = block.BLOCK[block.STONE]
+--            print (args[start],args[start+1])
+            node = {name="default:stone"}
         end
     end
     return node
