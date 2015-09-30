@@ -158,10 +158,25 @@ block.LEAVES_OAK_DECAYABLE = block.Block(block.LEAVES, 0)
 block.LEAVES_SPRUCE_DECAYABLE = block.Block(block.LEAVES, 1)
 block.LEAVES_BIRCH_DECAYABLE = block.Block(block.LEAVES, 2)
 block.LEAVES_JUNGLE_DECAYABLE = block.Block(block.LEAVES, 3)
+block.LEAVES_SPRUCE_DECAYABLE_CD = block.Block(block.LEAVES, 9)
+block.LEAVES_JUNGLE_DECAYABLE_CD = block.Block(block.LEAVES, 11)
 block.LEAVES_OAK_PERMANENT = block.Block(block.LEAVES, 4)
 block.LEAVES_SPRUCE_PERMANENT = block.Block(block.LEAVES, 5)
 block.LEAVES_BIRCH_PERMANENT = block.Block(block.LEAVES, 6)
 block.LEAVES_JUNGLE_PERMANENT = block.Block(block.LEAVES, 7)
+block.LEAVES_OAK_PERMANENT_CD = block.Block(block.LEAVES, 12)
+block.LEAVES_SPRUCE_PERMANENT_CD = block.Block(block.LEAVES, 13)
+block.LEAVES_BIRCH_PERMANENT_CD = block.Block(block.LEAVES, 14)
+block.LEAVES_JUNGLE_PERMANENT_CD = block.Block(block.LEAVES, 15)
+block.LEAVES2 = block.Block(161)
+block.LEAVES_ACACIA_DECAYABLE = block.Block(block.LEAVES2, 0)
+block.LEAVES_DARK_OAK_DECAYABLE = block.Block(block.LEAVES2, 1)
+block.LEAVES_ACACIA_PERMANENT = block.Block(block.LEAVES2, 4)
+block.LEAVES_DARK_OAK_PERMANENT = block.Block(block.LEAVES2, 5)
+block.LEAVES_ACACIA_DECAYABLE_CD = block.Block(block.LEAVES2, 8)
+block.LEAVES_DARK_OAK_DECAYABLE_CD = block.Block(block.LEAVES2, 9)
+block.LEAVES_ACACIA_PERMANENT_CD = block.Block(block.LEAVES2, 12)
+block.LEAVES_DARK_OAK_PERMANENT_CD = block.Block(block.LEAVES2, 13)
 
 block.BLOCK = {}
 block.BLOCK[block.AIR] = {name="air"}
@@ -225,7 +240,7 @@ block.BLOCK[block.ICE]={name="default:ice"}
 block.BLOCK[block.SNOW_BLOCK]={name="default:snowblock"}
 block.BLOCK[block.CACTUS]={name="default:cactus"}
 block.BLOCK[block.CLAY]={name="default:clay"}
-block.BLOCK[block.SUGAR_CANE]={name="farming:wheat"} -- fix
+block.BLOCK[block.SUGAR_CANE]={name="farming:straw"} -- fix
 block.BLOCK[block.FENCE]={name="default:fence_wood"}
 block.BLOCK[block.GLOWSTONE_BLOCK]={name="default:meselamp"} -- fix
 --block.BLOCK[block.BEDROCK_INVISIBLE]={name="default:"}
@@ -248,7 +263,7 @@ block.BLOCK[block.LILAC]={name="flowers:viola"}
 block.BLOCK[block.DOUBLE_TALLGRASS]={name="default:grass_2"} --fix
 --block.BLOCK[block.LARGE_FERN]={name="default:"}
 block.BLOCK[block.ROSE_BUSH]={name="flowers:rose"}
---block.BLOCK[block.PEONY]={name="default:"}
+block.BLOCK[block.PEONY]={name="flowers:rose"} --fix
 block.BLOCK[block.WOOL_WHITE]={name="wool:white"}
 block.BLOCK[block.WOOL_ORANGE]={name="wool:orange"}
 block.BLOCK[block.WOOL_MAGENTA]={name="wool:magenta"}
@@ -297,13 +312,26 @@ block.BLOCK[block.HARDENED_CLAY_STAINED_BROWN]={name="wool:brown"}
 block.BLOCK[block.HARDENED_CLAY_STAINED_GREEN]={name="wool:dark_green"}
 block.BLOCK[block.HARDENED_CLAY_STAINED_RED]={name="wool:red"}
 block.BLOCK[block.HARDENED_CLAY_STAINED_BLACK]={name="wool:black"}
-block.BLOCK[block.LEAVES_OAK_DECAYABLE]={name="default:leaves"}
-block.BLOCK[block.LEAVES_SPRUCE_DECAYABLE]={name="default:leaves"}
-block.BLOCK[block.LEAVES_BIRCH_DECAYABLE]={name="default:leaves"}
-block.BLOCK[block.LEAVES_JUNGLE_DECAYABLE]={name="default:leaves"}
-block.BLOCK[block.LEAVES_OAK_PERMANENT]={name="default:leaves"} --fix
-block.BLOCK[block.LEAVES_SPRUCE_PERMANENT]={name="default:leaves"} --fix
-block.BLOCK[block.LEAVES_BIRCH_PERMANENT]={name="default:leaves"} --fix
-block.BLOCK[block.LEAVES_JUNGLE_PERMANENT]={name="default:leaves"} --fix
+--block.BLOCK[block.LEAVES_OAK_DECAYABLE]={name="default:leaves"}
+block.BLOCK[block.LEAVES_SPRUCE_DECAYABLE]={name="default:pine_needles"}
+--block.BLOCK[block.LEAVES_BIRCH_DECAYABLE]={name="default:leaves"}
+block.BLOCK[block.LEAVES_JUNGLE_DECAYABLE]={name="default:jungleleaves"}
+block.BLOCK[block.LEAVES_OAK_PERMANENT]={name="default:leaves", param2=1}
+block.BLOCK[block.LEAVES_SPRUCE_PERMANENT]={name="default:pine_needles", param2=1}
+block.BLOCK[block.LEAVES_BIRCH_PERMANENT]={name="default:leaves", param2=1}
+block.BLOCK[block.LEAVES_SPRUCE_DECAYABLE_CD]={name="default:pine_needles"}
+block.BLOCK[block.LEAVES_JUNGLE_DECAYABLE_CD]={name="default:jungleleaves"}
+block.BLOCK[block.LEAVES_JUNGLE_PERMANENT]={name="default:jungleleaves", param2=1}
+block.BLOCK[block.LEAVES_OAK_PERMANENT_CD]={name="default:leaves", param2=1}
+block.BLOCK[block.LEAVES_SPRUCE_PERMANENT_CD]={name="default:pine_needles", param2=1}
+block.BLOCK[block.LEAVES_BIRCH_PERMANENT_CD]={name="default:leaves", param2=1}
+block.BLOCK[block.LEAVES_JUNGLE_PERMANENT_CD]={name="default:jungleleaves", param2=1}
+block.BLOCK[block.LEAVES2] = {name="default:leaves"}
+block.LEAVES_ACACIA_DECAYABLE = {name="default:acacia_leaves"}
+--block.LEAVES_DARK_OAK_DECAYABLE =
+block.LEAVES_ACACIA_PERMANENT = {name="default:acacia_leaves", param2=1}
+block.LEAVES_DARK_OAK_PERMANENT = {name="default:leaves", param2=1}
+block.LEAVES_ACACIA_PERMANENT_CD = {name="default:acacia_leaves", param2=1}
+block.LEAVES_DARK_OAK_PERMANENT_CD = {name="default:leaves", param2=1}
 
 return block
