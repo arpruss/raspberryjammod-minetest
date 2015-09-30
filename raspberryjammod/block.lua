@@ -72,6 +72,7 @@ block.GLOWSTONE_BLOCK     = block.Block(89)
 block.BEDROCK_INVISIBLE   = block.Block(95)
 block.STAINED_GLASS =       block.Block(95)
 block.TRAPDOOR            = block.Block(96)
+block.IRON_TRAPDOOR       = block.Block(167)
 block.STONE_BRICK         = block.Block(98)
 block.GLASS_PANE          = block.Block(102)
 block.MELON               = block.Block(103)
@@ -250,7 +251,6 @@ block.BLOCK[block.FENCE]={name="default:fence_wood"}
 block.BLOCK[block.GLOWSTONE_BLOCK]={name="default:meselamp"} -- fix
 --block.BLOCK[block.BEDROCK_INVISIBLE]={name="default:"}
 block.BLOCK[block.STAINED_GLASS]={name="default:glass"} -- fix
-block.BLOCK[block.TRAPDOOR]={name="doors:trapdoor"} -- fix
 block.BLOCK[block.STONE_BRICK]={name="default:stonebrick"}
 block.BLOCK[block.GLASS_PANE]={name="default:glass"} -- fix
 --block.BLOCK[block.MELON]={name="default:"}
@@ -346,5 +346,27 @@ block.BLOCK[block.Block(228)] = {name="air"}
 block.BLOCK[block.Block(229)] = {name="air"}
 block.BLOCK[block.Block(236)] = {name="air"}
 block.BLOCK[block.Block(254)] = {name="air"}
+
+local function defineTrapdoor(base_num,base_name)
+   block.BLOCK[block.Block(base_num,0)] = {name=base_name, param2=minetest.dir_to_facedir({x=-1,y=0,z=0})}
+   block.BLOCK[block.Block(base_num,1)] = {name=base_name, param2=minetest.dir_to_facedir({x=0,y=0,z=-1})}
+   block.BLOCK[block.Block(base_num,2)] = {name=base_name, param2=minetest.dir_to_facedir({x=0,y=0,z=1})}
+   block.BLOCK[block.Block(base_num,3)] = {name=base_name, param2=minetest.dir_to_facedir({x=1,y=0,z=0})}
+   block.BLOCK[block.Block(base_num,4+0)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=-1,y=0,z=0})}
+   block.BLOCK[block.Block(base_num,4+1)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=0,y=0,z=-1})}
+   block.BLOCK[block.Block(base_num,4+2)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=0,y=0,z=1})}
+   block.BLOCK[block.Block(base_num,4+3)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=1,y=0,z=0})}
+   block.BLOCK[block.Block(base_num,8+0)] = {name=base_name, param2=minetest.dir_to_facedir({x=-1,y=-1,z=0},true)}
+   block.BLOCK[block.Block(base_num,8+1)] = {name=base_name, param2=minetest.dir_to_facedir({x=0,y=-1,z=-1},true)}
+   block.BLOCK[block.Block(base_num,8+2)] = {name=base_name, param2=minetest.dir_to_facedir({x=0,y=-1,z=1},true)}
+   block.BLOCK[block.Block(base_num,8+3)] = {name=base_name, param2=minetest.dir_to_facedir({x=1,y=-1,z=0},true)}
+   block.BLOCK[block.Block(base_num,12+0)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=-1,y=-1,z=0})}
+   block.BLOCK[block.Block(base_num,12+1)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=0,y=-1,z=-1})}
+   block.BLOCK[block.Block(base_num,12+2)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=0,y=-1,z=1})}
+   block.BLOCK[block.Block(base_num,12+3)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=1,y=-1,z=0})}
+end
+
+defineTrapdoor(block.TRAPDOOR,"doors:trapdoor")
+defineTrapdoor(block.IRON_TRAPDOOR,"doors:trapdoor") -- fix
 
 return block
