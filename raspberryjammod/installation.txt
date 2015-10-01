@@ -1,2 +1,2 @@
-In socket/core.dll is a win32 Microsoft Visual C build from luasockets. Replace it with 
-something that fits your build of Minetest if you need to.
+In socket/core.dll is a win32 Microsoft Visual C build from luasockets as well as a win64
+build. Replace with something that fits your operating system if you need to.
