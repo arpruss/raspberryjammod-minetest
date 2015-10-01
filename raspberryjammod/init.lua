@@ -3,10 +3,6 @@
 -- Note: The x-coordinate is reversed in sign between minetest and minecraft,
 -- and the API compensates for this.
 
---for x,y in pairs(minetest.registered_nodes) do
---   print(x)
---end
-
 local source = debug.getinfo(1).source:sub(2)
 -- Detect windows via backslashes in paths
 local mypath = minetest.get_modpath(minetest.get_current_modname())
@@ -17,14 +13,15 @@ if is_windows then
 else
    path_separator = "/"
 end
+mypath = mypath .. path_separator
 
 local script_window_id = "minetest-rjm-python-script"
 
-package.path = package.path .. ";" .. mypath .. path_separator .. "?.lua"
+package.path = package.path .. ";" .. mypath .. "?.lua"
 if is_windows then
-   package.cpath = package.cpath .. ";" .. mypath .. path_separator .. "?.dll"
+   package.cpath = package.cpath .. ";" .. mypath .. "?.dll"
 else
-   package.cpath = package.cpath .. ";" .. mypath .. path_separator .. "?.so"
+   package.cpath = package.cpath .. ";" .. mypath .. "?.so"
 end
 
 local block = require("block")
