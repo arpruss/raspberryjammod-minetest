@@ -9,9 +9,6 @@ else
    ie = _G
 end
 
-print(ie.package)
-print(ie.package.path)
-
 local source = ie.debug.getinfo(1).source:sub(2)
 -- Detect windows via backslashes in paths
 local mypath = minetest.get_modpath(minetest.get_current_modname())
