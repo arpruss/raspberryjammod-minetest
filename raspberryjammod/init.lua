@@ -197,6 +197,25 @@ minetest.register_chatcommand("top",
 		pos.y = get_height(pos.x, pos.z)+1.5
 		player:setpos(pos)
 	end})
+--[[
+-- Currently removed as emerge_area() seems not to work.
+minetest.register_chatcommand("emerge",
+	{params="[<size>]" ,
+	description="Emerge cubical area at and above player (default size=200).",
+	func = function(name, args)
+		local player = minetest.get_player_by_name(name)
+		local pos = player:getpos()
+		local size
+		if args ~= "" then
+		    size = tonumber(args)
+                else
+                    size = 200
+                end
+                local p1 = {x = math.floor(pos.x - size/2), y = pos.y, z = math.floor(pos.z - size/2) }
+                local p2 = {x = math.ceil(pos.x + size/2), y = pos.y + size, z = math.ceil(pos.z + size/2) }
+                minetest.emerge_area(p1,p2)
+	end})
+--]]
 minetest.register_chatcommand("py",
 	{params="[<script> [<args>]]" ,
 	description="Run python script in raspberryjammod/mcpipy directory, killing any previous script",
