@@ -3,9 +3,9 @@
 -- Note: The x-coordinate is reversed in sign between minetest and minecraft,
 -- and the API compensates for this.
 
-for x,y in pairs(minetest.registered_nodes) do
-   print(x)
-end
+--for x,y in pairs(minetest.registered_nodes) do
+--   print(x)
+--end
 
 local source = debug.getinfo(1).source:sub(2)
 -- Detect windows via backslashes in paths
