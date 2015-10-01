@@ -219,7 +219,6 @@ block.BLOCK[block.MUSHROOM_RED]={name="flowers:mushroom_red"}
 block.BLOCK[block.GOLD_BLOCK]={name="default:goldblock"}
 block.BLOCK[block.IRON_BLOCK]={name="default:steelblock"}
 --block.BLOCK[block.STONE_SLAB_DOUBLE]={name="default:"}
---block.BLOCK[block.STONE_SLAB]={name="default:"}
 block.BLOCK[block.BRICK_BLOCK]={name="default:brick"}
 block.BLOCK[block.TNT]={name="tnt:tnt"}
 block.BLOCK[block.BOOKSHELF]={name="default:bookshelf"}
@@ -227,7 +226,7 @@ block.BLOCK[block.MOSS_STONE]={name="default:mossycobble"}
 block.BLOCK[block.OBSIDIAN]={name="default:obsidian"}
 block.BLOCK[block.TORCH]={name="default:torch"}
 block.BLOCK[block.FIRE]={name="fire:basic_flame"}
-block.BLOCK[block.STAIRS_WOOD]={name="stairs:stair_wood"}
+block.BLOCK[block.STAIRS_WOOD]={name="stairs:stair_wood"} -- FIX orientation
 block.BLOCK[block.CHEST]={name="default:chest"}
 block.BLOCK[block.DIAMOND_ORE]={name="default:stone_with_diamond"}
 block.BLOCK[block.DIAMOND_BLOCK]={name="default:diamondblock"}
@@ -255,7 +254,6 @@ block.BLOCK[block.STONE_BRICK]={name="default:stonebrick"}
 block.BLOCK[block.GLASS_PANE]={name="default:glass"} -- fix
 --block.BLOCK[block.MELON]={name="default:"}
 block.BLOCK[block.WOOD_SLAB_DOUBLE]={name="default:wood"} --fix
-block.BLOCK[block.WOOD_SLAB]={name="default:wood"} --fix
 --block.BLOCK[block.FENCE_GATE]={name="default:"}
 --block.BLOCK[block.WOOD_BUTTON]={name="default:"}
 block.BLOCK[block.REDSTONE_BLOCK]={name="wool:red"} -- fix
@@ -347,26 +345,56 @@ block.BLOCK[block.Block(229)] = {name="air"}
 block.BLOCK[block.Block(236)] = {name="air"}
 block.BLOCK[block.Block(254)] = {name="air"}
 
+block.BLOCK[block.Block(block.WOOD_SLAB,0)] = {name="stairs:slab_wood", param2=0}
+block.BLOCK[block.Block(block.WOOD_SLAB,8)] = {name="stairs:slab_wood", param2=20}
+block.BLOCK[block.Block(block.WOOD_SLAB,1)] = {name="stairs:slab_pine_wood", param2=0}
+block.BLOCK[block.Block(block.WOOD_SLAB,9)] = {name="stairs:slab_pine_wood", param2=20}
+block.BLOCK[block.Block(block.WOOD_SLAB,2)] = {name="stairs:slab_wood", param2=0}  -- FIX: birch
+block.BLOCK[block.Block(block.WOOD_SLAB,10)] = {name="stairs:slab_wood", param2=20}
+block.BLOCK[block.Block(block.WOOD_SLAB,3)] = {name="stairs:slab_junglewood", param2=0}
+block.BLOCK[block.Block(block.WOOD_SLAB,11)] = {name="stairs:slab_junglewood", param2=20}
+block.BLOCK[block.Block(block.WOOD_SLAB,4)] = {name="stairs:slab_acacia_wood", param2=0}
+block.BLOCK[block.Block(block.WOOD_SLAB,12)] = {name="stairs:slab_acacia_wood", param2=20}
+block.BLOCK[block.Block(block.WOOD_SLAB,5)] = {name="stairs:slab_wood", param2=0} -- FIX: dark oak
+block.BLOCK[block.Block(block.WOOD_SLAB,13)] = {name="stairs:slab_wood", param2=20}
+
+block.BLOCK[block.Block(block.STONE_SLAB,0)] = {name="stairs:slab_stone", param2=0}
+block.BLOCK[block.Block(block.STONE_SLAB,8)] = {name="stairs:slab_stone", param2=20}
+block.BLOCK[block.Block(block.STONE_SLAB,1)] = {name="stairs:slab_sandstone", param2=0}
+block.BLOCK[block.Block(block.STONE_SLAB,9)] = {name="stairs:slab_sandstone", param2=20}
+block.BLOCK[block.Block(block.STONE_SLAB,2)] = {name="stairs:slab_wood", param2=0}
+block.BLOCK[block.Block(block.STONE_SLAB,10)] = {name="stairs:slab_wood", param2=20}
+block.BLOCK[block.Block(block.STONE_SLAB,3)] = {name="stairs:slab_cobble", param2=0}
+block.BLOCK[block.Block(block.STONE_SLAB,11)] = {name="stairs:slab_cobble", param2=20}
+block.BLOCK[block.Block(block.STONE_SLAB,4)] = {name="stairs:slab_brick", param2=0}
+block.BLOCK[block.Block(block.STONE_SLAB,12)] = {name="stairs:slab_brick", param2=20}
+block.BLOCK[block.Block(block.STONE_SLAB,6)] = {name="stairs:slab_stonebrick", param2=0}
+block.BLOCK[block.Block(block.STONE_SLAB,13)] = {name="stairs:slab_stonebrick", param2=20}
+block.BLOCK[block.Block(block.STONE_SLAB,7)] = {name="stairs:slab_desert_stonebrick", param2=0} -- FIX: nether brick
+block.BLOCK[block.Block(block.STONE_SLAB,14)] = {name="stairs:slab_desert_stonebrick", param2=20}
+block.BLOCK[block.Block(block.STONE_SLAB,8)] = {name="stairs:slab_desert_stone", param2=0} -- FIX: quartz
+block.BLOCK[block.Block(block.STONE_SLAB,15)] = {name="stairs:slab_desert_stone", param2=20}
+
 local function defineTrapdoor(base_num,base_name)
-   block.BLOCK[block.Block(base_num,0)] = {name=base_name, param2=minetest.dir_to_facedir({x=-1,y=0,z=0})}
-   block.BLOCK[block.Block(base_num,1)] = {name=base_name, param2=minetest.dir_to_facedir({x=0,y=0,z=-1})}
-   block.BLOCK[block.Block(base_num,2)] = {name=base_name, param2=minetest.dir_to_facedir({x=0,y=0,z=1})}
-   block.BLOCK[block.Block(base_num,3)] = {name=base_name, param2=minetest.dir_to_facedir({x=1,y=0,z=0})}
-   block.BLOCK[block.Block(base_num,4+0)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=-1,y=0,z=0})}
-   block.BLOCK[block.Block(base_num,4+1)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=0,y=0,z=-1})}
-   block.BLOCK[block.Block(base_num,4+2)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=0,y=0,z=1})}
-   block.BLOCK[block.Block(base_num,4+3)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=1,y=0,z=0})}
-   block.BLOCK[block.Block(base_num,8+0)] = {name=base_name, param2=minetest.dir_to_facedir({x=-1,y=-1,z=0},true)}
-   block.BLOCK[block.Block(base_num,8+1)] = {name=base_name, param2=minetest.dir_to_facedir({x=0,y=-1,z=-1},true)}
-   block.BLOCK[block.Block(base_num,8+2)] = {name=base_name, param2=minetest.dir_to_facedir({x=0,y=-1,z=1},true)}
-   block.BLOCK[block.Block(base_num,8+3)] = {name=base_name, param2=minetest.dir_to_facedir({x=1,y=-1,z=0},true)}
-   block.BLOCK[block.Block(base_num,12+0)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=-1,y=-1,z=0})}
-   block.BLOCK[block.Block(base_num,12+1)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=0,y=-1,z=-1})}
-   block.BLOCK[block.Block(base_num,12+2)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=0,y=-1,z=1})}
-   block.BLOCK[block.Block(base_num,12+3)] = {name=base_name.."_open", param2=minetest.dir_to_facedir({x=1,y=-1,z=0})}
+   block.BLOCK[block.Block(base_num,0)] = {name=base_name, param2=2}
+   block.BLOCK[block.Block(base_num,1)] = {name=base_name, param2=0}
+   block.BLOCK[block.Block(base_num,2)] = {name=base_name, param2=1}
+   block.BLOCK[block.Block(base_num,3)] = {name=base_name, param2=3}
+   block.BLOCK[block.Block(base_num,4+0)] = {name=base_name.."_open", param2=2}
+   block.BLOCK[block.Block(base_num,4+1)] = {name=base_name.."_open", param2=0}
+   block.BLOCK[block.Block(base_num,4+2)] = {name=base_name.."_open", param2=1}
+   block.BLOCK[block.Block(base_num,4+3)] = {name=base_name.."_open", param2=3}
+   block.BLOCK[block.Block(base_num,8+0)] = {name=base_name, param2=22}
+   block.BLOCK[block.Block(base_num,8+1)] = {name=base_name, param2=20}
+   block.BLOCK[block.Block(base_num,8+2)] = {name=base_name, param2=23}
+   block.BLOCK[block.Block(base_num,8+3)] = {name=base_name, param2=21}
+   block.BLOCK[block.Block(base_num,4+8+0)] = {name=base_name.."_open", param2=22}
+   block.BLOCK[block.Block(base_num,4+8+1)] = {name=base_name.."_open", param2=20}
+   block.BLOCK[block.Block(base_num,4+8+2)] = {name=base_name.."_open", param2=23}
+   block.BLOCK[block.Block(base_num,4+8+3)] = {name=base_name.."_open", param2=21}
 end
 
 defineTrapdoor(block.TRAPDOOR,"doors:trapdoor")
-defineTrapdoor(block.IRON_TRAPDOOR,"doors:trapdoor") -- fix
+defineTrapdoor(block.IRON_TRAPDOOR,"doors:trapdoor")
 
 return block

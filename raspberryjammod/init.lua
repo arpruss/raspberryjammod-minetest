@@ -180,12 +180,12 @@ minetest.register_on_punchnode(function(pos, oldnode, puncher, pointed_thing)
     if (puncher:is_player()) then
        local item = puncher:get_wielded_item()
        if not restrict_to_sword or (item and item:get_name():find("%:sword")) then
-          table.insert(block_hits, ""..(-pos.x)..","..pos.y..","..pos.z..",7,"..get_entity_id(puncher))
+          table.insert(block_hits, pos.x..","..pos.y..","..(-pos.z)..",7,"..get_entity_id(puncher))
        end
     end
 end)
 
-minetest.register_chatcommand("top", 
+minetest.register_chatcommand("top",
 	{params="" ,
 	description="Move player on top of everything.",
 	func = function(name, args)
@@ -194,19 +194,19 @@ minetest.register_chatcommand("top",
 		pos.y = get_height(pos.x, pos.z)+1.5
 		player:setpos(pos)
 	end})
-minetest.register_chatcommand("py", 
+minetest.register_chatcommand("py",
 	{params="[<script> [<args>]]" ,
 	description="Run python script in raspberryjammod/mcpipy directory, killing any previous script",
 	func = function(name, args) python(name, args, true) end })
-minetest.register_chatcommand("python", 
+minetest.register_chatcommand("python",
 	{params="[<script> [<args>]]" ,
 	description="Run python script in raspberryjammod/mcpipy directory, killing any previous script",
 	func = function(name, args) python(name, args, true) end })
-minetest.register_chatcommand("apy", 
+minetest.register_chatcommand("apy",
 	{params="[<script> [<args>]]" ,
 	description="Run python script in raspberryjammod/mcpipy directory, without killing any previous script",
 	func = function(name, args) python(name, args, true) end })
-minetest.register_chatcommand("apython", 
+minetest.register_chatcommand("apython",
 	{params="[<script> [<args>]]" ,
 	description="Run python script in raspberryjammod/mcpipy directory, without killing any previous script",
 	func = function(name, args) python(name, args, true) end })
@@ -219,7 +219,7 @@ function python(name, args, kill_script)
 	end
 
 	if args == "" then return end
-	
+
 	local script, argtext = args:match("^([^ ]+) *(.*)")
 	if argtext:sub(#argtext) == " " then argtext = argtext:sub(1,#argtext - 1) end
 
@@ -280,21 +280,21 @@ function handle_entity(cmd, id, args)
     end
     if cmd == "getPos" then
         local pos = entity:getpos()
-        return ""..(0.5-pos.x)..","..(pos.y+0.5)..","..(pos.z+0.5)
+        return (pos.x+0.5)..","..(pos.y+0.5)..","..(0.5-pos.z)
     elseif cmd == "getTile" then
         local pos = entity:getpos()
-        return ""..math.floor(0.5-pos.x)..","..math.floor(pos.y+0.5)..","..math.floor(pos.z+0.5)
+        return math.floor(pos.x+0.5)..","..math.floor(pos.y+0.5)..","..math.floor(0.5-pos.z)
     elseif cmd == "setPos" then
-        entity:setpos({x=0.5-tonumber(args[1]), y=tonumber(args[2])-0.5, z=tonumber(args[3])-0.5})
+        entity:setpos({x=tonumber(args[1])-0.5, y=tonumber(args[2])-0.5, z=0.5-tonumber(args[3])})
     elseif cmd == "setTile" then
-        entity:setpos({x=-tonumber(args[1]), y=tonumber(args[2])-0.5, z=tonumber(args[3])})
+        entity:setpos({x=tonumber(args[1]), y=tonumber(args[2])-0.5, z=-tonumber(args[3])})
     elseif cmd == "getPitch" then
-        return ""..(entity:get_look_pitch() * -180 / math.pi)
+        return tonumber(entity:get_look_pitch() * -180 / math.pi)
     elseif cmd == "getRotation" then
-        return ""..((90 - entity:get_look_yaw() * 180 / math.pi) % 360)
+        return tonumber((270 - entity:get_look_yaw() * 180 / math.pi) % 360)
     elseif cmd == "getDirection" then
         local dir = entity:get_look_dir()
-        return ""..(-dir.x)..","..(dir.y)..","..(dir.z)
+        return (dir.x)..","..(dir.y)..","..(-dir.z)
     elseif cmd == "setPitch" then
         -- TODO: For mysterious reasons, set_look_pitch() and get_look_pitch()
         -- values are opposite sign, so we don't negate here. Ideally, the mod
@@ -306,7 +306,7 @@ function handle_entity(cmd, id, args)
         -- values differ by pi/2. Ideally, the mod
         -- would detect this to make sure that if it's fixed in the next version
         -- this wouldn't be an issue.
-        entity:set_look_yaw((-tonumber(args[1])) * math.pi / 180)
+        entity:set_look_yaw(180 + (-tonumber(args[1])) * math.pi / 180)
     elseif cmd == "setDirection" then
         -- TODO: Fix set_look_yaw() and get_look_yaw() compensation.
         local x = tonumber(args[1])
@@ -358,17 +358,19 @@ end
 function handle_world(cmd, args)
     if cmd == "setBlock" then
         local node = parse_node(args, 4)
-        minetest.set_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])},node)
+        minetest.set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])},node)
     elseif cmd == "setNode" then
-        minetest.set_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])},{name=args[4]})
+        local node = {name=args[4]}
+        if args[5] then node.param2 = tonumber(args[5]) end
+        minetest.set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])},node)
     elseif cmd == "setBlocks" then
         local node = parse_node(args, 7)
-        local x1 = math.min(-tonumber(args[1]),-tonumber(args[4]))
-        local x2 = math.max(-tonumber(args[1]),-tonumber(args[4]))
+        local x1 = math.min(tonumber(args[1]),tonumber(args[4]))
+        local x2 = math.max(tonumber(args[1]),tonumber(args[4]))
         local y1 = math.min(tonumber(args[2]),tonumber(args[5]))
         local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
-        local z1 = math.min(tonumber(args[3]),tonumber(args[6]))
-        local z2 = math.max(tonumber(args[3]),tonumber(args[6]))
+        local z1 = math.min(-tonumber(args[3]),-tonumber(args[6]))
+        local z2 = math.max(-tonumber(args[3]),-tonumber(args[6]))
         for ycoord = y1,y2 do
           for xcoord = x1,x2 do
             for zcoord = z1,z2 do
@@ -377,13 +379,14 @@ function handle_world(cmd, args)
           end
         end
     elseif cmd == "setNodes" then
-        local node = {node = args[7]}
-        local x1 = math.min(-tonumber(args[1]),-tonumber(args[4]))
-        local x2 = math.max(-tonumber(args[1]),-tonumber(args[4]))
+        local node = {name=args[7]}
+        if args[8] then node.param2 = tonumber(args[8]) end
+        local x1 = math.min(tonumber(args[1]),tonumber(args[4]))
+        local x2 = math.max(tonumber(args[1]),tonumber(args[4]))
         local y1 = math.min(tonumber(args[2]),tonumber(args[5]))
         local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
-        local z1 = math.min(tonumber(args[3]),tonumber(args[6]))
-        local z2 = math.max(tonumber(args[3]),tonumber(args[6]))
+        local z1 = math.min(-tonumber(args[3]),-tonumber(args[6]))
+        local z2 = math.max(-tonumber(args[3]),-tonumber(args[6]))
         for ycoord = y1,y2 do
           for xcoord = x1,x2 do
             for zcoord = z1,z2 do
@@ -392,9 +395,10 @@ function handle_world(cmd, args)
           end
         end
     elseif cmd == "getNode" then
-        return minetest.get_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])}).name
+        local node = minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])})
+        return node.name .. node.param2
     elseif cmd == "getBlockWithData" or cmd == "getBlock" then
-        local node = minetest.get_node({x=-tonumber(args[1]),y=tonumber(args[2]),z=tonumber(args[3])})
+        local node = minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])})
         local id, meta
         if node == "ignore" then
             id = block.AIR
@@ -416,7 +420,7 @@ function handle_world(cmd, args)
             return ""..id..","..meta
         end
     elseif cmd == "getHeight" then
-	    return tonumber(get_height(-tonumber(args[1]),tonumber(args[2])))
+	    return tonumber(get_height(tonumber(args[1]),-tonumber(args[2])))
     elseif cmd == "getPlayerId" then
         if #args > 0 then
             local id = get_player_id_by_name(args[1])
