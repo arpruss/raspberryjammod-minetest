@@ -47,7 +47,7 @@ block.MOSS_STONE          = block.Block(48)
 block.OBSIDIAN            = block.Block(49)
 block.TORCH               = block.Block(50)
 block.FIRE                = block.Block(51)
-block.STAIRS_WOOD         = block.Block(53)
+block.stair_WOOD         = block.Block(53)
 block.CHEST               = block.Block(54)
 block.DIAMOND_ORE         = block.Block(56)
 block.DIAMOND_BLOCK       = block.Block(57)
@@ -57,7 +57,7 @@ block.FURNACE_INACTIVE    = block.Block(61)
 block.FURNACE_ACTIVE      = block.Block(62)
 block.DOOR_WOOD           = block.Block(64)
 block.LADDER              = block.Block(65)
-block.STAIRS_COBBLESTONE  = block.Block(67)
+block.stair_COBBLESTONE  = block.Block(67)
 block.DOOR_IRON           = block.Block(71)
 block.REDSTONE_ORE        = block.Block(73)
 block.STONE_BUTTON        = block.Block(77)
@@ -226,7 +226,7 @@ block.BLOCK[block.MOSS_STONE]={name="default:mossycobble"}
 block.BLOCK[block.OBSIDIAN]={name="default:obsidian"}
 block.BLOCK[block.TORCH]={name="default:torch"}
 block.BLOCK[block.FIRE]={name="fire:basic_flame"}
-block.BLOCK[block.STAIRS_WOOD]={name="stairs:stair_wood"} -- FIX orientation
+block.BLOCK[block.stair_WOOD]={name="stairs:stair_wood"} -- FIX orientation
 block.BLOCK[block.CHEST]={name="default:chest"}
 block.BLOCK[block.DIAMOND_ORE]={name="default:stone_with_diamond"}
 block.BLOCK[block.DIAMOND_BLOCK]={name="default:diamondblock"}
@@ -234,10 +234,8 @@ block.BLOCK[block.DIAMOND_BLOCK]={name="default:diamondblock"}
 block.BLOCK[block.FARMLAND]={name="farming:soil"}
 block.BLOCK[block.FURNACE_INACTIVE]={name="default:furnace"}
 block.BLOCK[block.FURNACE_ACTIVE]={name="default:furnace_active"}
-block.BLOCK[block.DOOR_WOOD]={name="doors:door_wood"}
 block.BLOCK[block.LADDER]={name="default:ladder"}
-block.BLOCK[block.STAIRS_COBBLESTONE]={name="stairs:cobble"}
-block.BLOCK[block.DOOR_IRON]={name="doors:door_steel"}
+block.BLOCK[block.stair_COBBLESTONE]={name="stairs:stair_cobble"}
 block.BLOCK[block.REDSTONE_ORE]={name="wool:red"} -- fix
 --block.BLOCK[block.STONE_BUTTON]={name="default:"}
 block.BLOCK[block.SNOW]={name="default:snow"}
@@ -396,5 +394,33 @@ end
 
 defineTrapdoor(block.TRAPDOOR,"doors:trapdoor")
 defineTrapdoor(block.IRON_TRAPDOOR,"doors:trapdoor")
+
+local function defineDoor(base_num,base_name)
+   block.BLOCK[block.Block(base_num,0)] = {name=base_name.."_b_2"}
+   block.BLOCK[block.Block(base_num,1)] = {name=base_name.."_b_2"}
+   block.BLOCK[block.Block(base_num,2)] = {name=base_name.."_b_2"}
+   block.BLOCK[block.Block(base_num,3)] = {name=base_name.."_b_2"}
+   block.BLOCK[block.Block(base_num,4+0)] = {name=base_name.."_b_2"}
+   block.BLOCK[block.Block(base_num,4+1)] = {name=base_name.."_b_2"}
+   block.BLOCK[block.Block(base_num,4+2)] = {name=base_name.."_b_2"}
+   block.BLOCK[block.Block(base_num,4+3)] = {name=base_name.."_b_2"}
+   block.BLOCK[block.Block(base_num,8+0)] = {name=base_name.."_t_2"}
+   block.BLOCK[block.Block(base_num,8+1)] = {name=base_name.."_t_2"}
+   block.BLOCK[block.Block(base_num,8+2)] = {name=base_name.."_t_2"}
+   block.BLOCK[block.Block(base_num,8+3)] = {name=base_name.."_t_2"}
+   block.BLOCK[block.Block(base_num,4+8+0)] = {name=base_name.."_t_2"}
+   block.BLOCK[block.Block(base_num,4+8+1)] = {name=base_name.."_t_2"}
+   block.BLOCK[block.Block(base_num,4+8+2)] = {name=base_name.."_t_2"}
+   block.BLOCK[block.Block(base_num,4+8+3)] = {name=base_name.."_t_2"}
+-- lots of fixes to be done!
+-- it might not be doable as MC upper doors don't have directional data
+end
+
+defineDoor(block.DOOR_WOOD, "doors:door_wood")
+defineDoor(block.DOOR_IRON, "doors:door_steel")
+
+block.BLOCK[block.DOOR_WOOD]={name="doors:door_wood"}
+block.BLOCK[block.DOOR_IRON]={name="doors:door_steel"}
+
 
 return block
