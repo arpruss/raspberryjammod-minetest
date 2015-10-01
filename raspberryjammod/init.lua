@@ -360,7 +360,6 @@ end
 function handle_world(cmd, args)
     if cmd == "setBlock" then
         local node = parse_node(args, 4)
-        print(node.name)
         minetest.set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])},node)
     elseif cmd == "setNode" then
         local node = {name=args[4]}
