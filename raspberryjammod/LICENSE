@@ -2,9 +2,9 @@ The MIT License (MIT)
 
 RaspberryJamMod Copyright (c) 2015 Alexander R. Pruss
 Lua Copyright (c) 1994–2015 Lua.org, PUC-Rio.
-luasocket Copyright (c) Diego Nehab (with socket.lua changed by ARP to load x64/x86 as needed)
-tools.lua adapted from lua-websockets Copyright (c) 2012 Gerhard Lipp (with base64 inactivated)
-base64.lua Copyright (c) 2014 Mark Rogaski and (C) 2012 Paul Moore (changed by ARP to MIME encoding)
+luasocket Copyright (c) Diego Nehab (with socket.lua changed by ARP to load x64/x86 as needed, and minetest compatibility)
+tools.lua adapted from lua-websockets Copyright (c) 2012 Gerhard Lipp (with base64 inactivated and minetest compatibility)
+base64.lua Copyright (c) 2014 Mark Rogaski and (C) 2012 Paul Moore (changed by ARP to MIME encoding and minetest compatibility)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

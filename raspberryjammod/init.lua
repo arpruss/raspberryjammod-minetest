@@ -3,10 +3,19 @@
 -- Note: The x-coordinate is reversed in sign between minetest and minecraft,
 -- and the API compensates for this.
 
-local source = debug.getinfo(1).source:sub(2)
+if minetest.request_insecure_environment then
+   ie = minetest.request_insecure_environment()
+else
+   ie = _G
+end
+
+print(ie.package)
+print(ie.package.path)
+
+local source = ie.debug.getinfo(1).source:sub(2)
 -- Detect windows via backslashes in paths
 local mypath = minetest.get_modpath(minetest.get_current_modname())
-local is_windows = (nil ~= string.find(package.path..package.cpath..source..mypath, "%\\%?"))
+local is_windows = (nil ~= string.find(ie.package.path..ie.package.cpath..source..mypath, "%\\%?"))
 local path_separator
 if is_windows then
    path_separator = "\\"
@@ -17,15 +26,15 @@ mypath = mypath .. path_separator
 
 local script_window_id = "minetest-rjm-python-script"
 
-package.path = package.path .. ";" .. mypath .. "?.lua"
+ie.package.path = ie.package.path .. ";" .. mypath .. "?.lua"
 if is_windows then
-   package.cpath = package.cpath .. ";" .. mypath .. "?.dll"
+   ie.package.cpath = ie.package.cpath .. ";" .. mypath .. "?.dll"
 else
-   package.cpath = package.cpath .. ";" .. mypath .. "?.so"
+   ie.package.cpath = ie.package.cpath .. ";" .. mypath .. "?.so"
 end
 
-local block = require("block")
-local socket = require("socket")
+local block = ie.require("block")
+local socket = ie.require("socket")
 
 local block_hits = {}
 local chat_record = {}
@@ -38,7 +47,7 @@ max_player_id = 0
 default_player_id = -1
 world_immutable = false
 
-local settings = Settings(mypath .. path_separator .. "settings.conf")
+local settings = Settings(mypath .. "settings.conf")
 local update_settings = false
 python_interpreter = settings:get("python")
 if python_interpreter == nil then
@@ -75,8 +84,8 @@ server:settimeout(0)
 local ws_server = nil
 
 if ws then
-    tools = require("tools")
-    base64 = require("base64")
+    tools = ie.require("tools")
+    base64 = ie.require("base64")
     ws_server = socket.bind(remote_address, 14711)
     ws_server:setoption('tcp-nodelay',true)
     ws_server:settimeout(0)
@@ -491,13 +500,13 @@ function background_launch(window_identifier, cmd)
     if not is_windows then return false end
     local cmdline = 'start "' .. window_identifier .. '" /MIN ' .. cmd
     minetest.log("action", "launching ["..cmdline.."]")
-    os.execute(cmdline)
+    ie.os.execute(cmdline)
 end
 
 function kill(window_identifier)
     -- TODO: non-Windows
     minetest.log('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
-    os.execute('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
+    ie.os.execute('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
 end
 
 function safe_handle_command(source,line)

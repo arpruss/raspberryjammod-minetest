@@ -1,3 +1,8 @@
+if minetest.request_insecure_environment then
+   ie = minetest.request_insecure_environment()
+else
+   ie = _G
+end
 -----------------------------------------------------------------------------
 -- LuaSocket helper module
 -- Author: Diego Nehab
@@ -8,15 +13,15 @@
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
 local base = _G
-local string = require("string")
-local math = require("math")
+local string = ie.require("string")
+local math = ie.require("math")
 local socket
-local status,err = pcall(function() socket = require("socket.core") end)
+local status,err = pcall(function() socket = ie.require("socket.core") end)
 if not status then
-   socket = require("socket.cx64")
+   socket = ie.require("socket.cx64")
 end
 
-module("socket")
+ie.module("socket")
 
 -----------------------------------------------------------------------------
 -- Exported auxiliar functions

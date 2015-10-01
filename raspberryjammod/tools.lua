@@ -1,4 +1,10 @@
-local bit = require 'bit'
+if minetest.request_insecure_environment then
+   ie = minetest.request_insecure_environment()
+else
+   ie = _G
+end
+
+local bit = ie.require 'bit'
 local rol = bit.rol
 local bxor = bit.bxor
 local bor = bit.bor

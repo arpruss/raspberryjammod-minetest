@@ -1,3 +1,8 @@
+if minetest.request_insecure_environment then
+   ie = minetest.request_insecure_environment()
+else
+   ie = _G
+end
 --[[--------------------------------------------------------------------------
 
 The MIT License (MIT)
@@ -53,7 +58,7 @@ local Base64 = {}
 -- Imports
 ----------------------------------------------------------------------------
 
-require("bit")
+bit = ie.require("bit")
 
 local band, bor, lshift, rshift = bit.band, bit.bor, bit.lshift, bit.rshift
 
