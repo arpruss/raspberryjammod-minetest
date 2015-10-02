@@ -245,7 +245,6 @@ block.BLOCK[block.SUGAR_CANE]={name="farming:straw"} -- fix
 block.BLOCK[block.FENCE]={name="default:fence_wood"}
 block.BLOCK[block.GLOWSTONE_BLOCK]={name="default:meselamp"} -- fix
 --block.BLOCK[block.BEDROCK_INVISIBLE]={name="default:"}
-block.BLOCK[block.STAINED_GLASS]={name="default:glass"} -- fix
 block.BLOCK[block.STONE_BRICK]={name="default:stonebrick"}
 block.BLOCK[block.GLASS_PANE]={name="default:glass"} -- fix
 --block.BLOCK[block.MELON]={name="default:"}
@@ -314,6 +313,24 @@ block.BLOCK[block.HARDENED_CLAY_STAINED_BROWN]={name="wool:brown"}
 block.BLOCK[block.HARDENED_CLAY_STAINED_GREEN]={name="wool:dark_green"}
 block.BLOCK[block.HARDENED_CLAY_STAINED_RED]={name="wool:red"}
 block.BLOCK[block.HARDENED_CLAY_STAINED_BLACK]={name="wool:black"}
+
+block.BLOCK[block.STAINED_GLASS_WHITE]={name="stained_glass:faint_aqua"} --fix
+block.BLOCK[block.STAINED_GLASS_ORANGE]={name="stained_glass:orange"}
+block.BLOCK[block.STAINED_GLASS_MAGENTA]={name="stained_glass:magenta"}
+block.BLOCK[block.STAINED_GLASS_LIGHT_BLUE]={name="stained_glass:faint_blue"}
+block.BLOCK[block.STAINED_GLASS_YELLOW]={name="stained_glass:yellow"}
+block.BLOCK[block.STAINED_GLASS_LIME]={name="stained_glass:lime"}
+block.BLOCK[block.STAINED_GLASS_PINK]={name="stained_glass:faint_red"}
+block.BLOCK[block.STAINED_GLASS_GRAY]={name="stained_glass:dark_blue"} --fix
+block.BLOCK[block.STAINED_GLASS_LIGHT_GRAY]={name="stained_glass:medium_blue"} --fix
+block.BLOCK[block.STAINED_GLASS_CYAN]={name="stained_glass:cyan"}
+block.BLOCK[block.STAINED_GLASS_PURPLE]={name="stained_glass:violet"}
+block.BLOCK[block.STAINED_GLASS_BLUE]={name="stained_glass:blue"}
+block.BLOCK[block.STAINED_GLASS_BROWN]={name="stained_glass:dark_red"}
+block.BLOCK[block.STAINED_GLASS_GREEN]={name="stained_glass:green"}
+block.BLOCK[block.STAINED_GLASS_RED]={name="stained_glass:red"}
+block.BLOCK[block.STAINED_GLASS_BLACK]={name="stained_glass:dark_green"} --fix
+
 --block.BLOCK[block.LEAVES_OAK_DECAYABLE]={name="default:leaves"}
 block.BLOCK[block.LEAVES_SPRUCE_DECAYABLE]={name="default:pine_needles"}
 --block.BLOCK[block.LEAVES_BIRCH_DECAYABLE]={name="default:leaves"}
@@ -448,8 +465,12 @@ minetest.log("info", "Checking for missing blocks")
 for id,entry in pairs(block.BLOCK) do
    if not minetest.registered_nodes[entry.name] then
         minetest.log("error", "Missing block "..entry.name)
-        entry.name = "default:stone"
-        entry.param2 = "0"
+        if entry.name.sub(1,14) == "stained_glass:" then
+            entry.name = "default:glass"
+        else
+            entry.name = "default:stone"
+            entry.param2 = "0"
+        end
    end
 end
 

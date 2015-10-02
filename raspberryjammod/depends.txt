@@ -3,3 +3,4 @@ wool
 farming?
 doors?
 flowers?
+stained_glass?
