@@ -350,20 +350,13 @@ function handle_entity(cmd, id, args)
 end
 
 function parse_node(args, start)
-    local nodenum
+    local id, meta
     if #args < start then
-        nodenum = 0
+        return {name="air"}
     elseif #args == start then
-        nodenum = block.Block(tonumber(args[start]),0)
+        return block.id_meta_to_node(tonumber(args[start]),0)
     else
-        nodenum = block.Block(tonumber(args[start]),tonumber(args[start+1]))
-    end
-    local node = block.BLOCK[nodenum]
-    if node == nil then
-        node = block.BLOCK[bit.band(nodenum,0xFFF)]
-        if not node then
-            node = {name="default:stone"}
-        end
+	    return block.id_meta_to_node(tonumber(args[start]),tonumber(args[start+1]))
     end
     return node
 end
@@ -424,25 +417,11 @@ function handle_world(cmd, args)
         return node.name .. "," .. node.param2
     elseif cmd == "getBlockWithData" or cmd == "getBlock" then
         local node = minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])})
-        local id, meta
-        if node == "ignore" then
-            id = block.AIR
-            meta = 0
-        else
-            id = block.STONE
-            meta = 0
-            for key,value in pairs(block.BLOCK) do
-                if value.name == node.name then
-                    id = math.floor(bit.band(key,0xFFF))
-                    meta = math.floor(bit.rshift(key,12))
-                    break
-                end
-            end
-        end
+        local id, meta = block.node_to_id_meta(node)
         if cmd == "getBlock" then
-            return ""..id
+            return tostring(id)
         else
-            return ""..id..","..meta
+            return id..","..meta
         end
     elseif cmd == "getHeight" then
 	    return tonumber(get_height(tonumber(args[1]),-tonumber(args[2])))
