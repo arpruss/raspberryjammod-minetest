@@ -421,7 +421,7 @@ function handle_world(cmd, args)
         end
     elseif cmd == "getNode" then
         local node = minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])})
-        return node.name .. node.param2
+        return node.name .. "," .. node.param2
     elseif cmd == "getBlockWithData" or cmd == "getBlock" then
         local node = minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])})
         local id, meta
