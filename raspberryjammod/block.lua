@@ -448,6 +448,8 @@ minetest.log("info", "Checking for missing blocks")
 for id,entry in pairs(block.BLOCK) do
    if not minetest.registered_nodes[entry.name] then
         minetest.log("error", "Missing block "..entry.name)
+        entry.name = "default:stone"
+        entry.param2 = "0"
    end
 end
 
