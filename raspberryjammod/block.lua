@@ -10,11 +10,11 @@ local block={}
 
 local function Block(id,meta)
     if meta == nil then meta=0 end
-    return meta + id * 16
+    return meta * 0x1000 + id
 end
 
 local function unBlock(value)
-    return bit.rshift(value, 4),bit.band(value, 0x000F)
+    return bit.band(value, 0xFFF),bit.rshift(value, 12)
 end
 
 block.AIR                =Block(0)
@@ -198,7 +198,7 @@ block.LEAVES_DARK_OAK_PERMANENT_CD=Block(block.LEAVES2, 13)
 local to_node={}
 local from_node={}
 
-local function translate(id, name,param2) 
+local function translate(id, name, param2)
 	if not param2 then param2=0 end
     if not minetest.registered_nodes[name] then
 		if name.sub(1,14)=="stained_glass:" then
@@ -493,7 +493,7 @@ defineStair(180, "stairs:stair_sandstone") -- fix: red sandstone
 defineStair(203, "stairs:stair_wood") -- fix: purpur
 
 
-function block.node_to_id_meta(node) 
+function block.node_to_id_meta(node)
 	if node.name == "air" or node.name == "ignore" then
 		return "0"
 	end
@@ -508,7 +508,7 @@ function block.node_to_id_meta(node)
 	return unBlock(block.STONE)
 end
 
-function block.id_meta_to_node(id, meta) 
+function block.id_meta_to_node(id, meta)
     if id == 0 then
 		return {name="air"}
 	end
