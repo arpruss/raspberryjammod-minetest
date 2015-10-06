@@ -472,14 +472,17 @@ local function setNodes(args, node)
 	local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
 	local z1 = math.min(-tonumber(args[3]),-tonumber(args[6]))
 	local z2 = math.max(-tonumber(args[3]),-tonumber(args[6]))
-	if ((x2+1-x1)*(y2+1-y1)*(z2+1-z1) >= 100) then
+	
+	local volume = (x2+1-x1)*(y2+1-y1)*(z2+1-z1) 
+
+	if 100 <= volume and volume <= 20000000 then
 		set_nodes_with_voxelmanip(x1,y1,z1,x2,y2,z2,node)
-		return
-	end
-	for ycoord = y1,y2 do
-		for xcoord = x1,x2 do
-			for zcoord = z1,z2 do
-			   minetest.set_node({x=xcoord,y=ycoord,z=zcoord},node)
+	else
+		for ycoord = y1,y2 do
+			for xcoord = x1,x2 do
+				for zcoord = z1,z2 do
+				   minetest.set_node({x=xcoord,y=ycoord,z=zcoord},node)
+				end
 			end
 		end
 	end
