@@ -389,19 +389,10 @@ local block_buffer_p2 = {}
 
 function flush_block_buffer()
 	if #block_buffer >= 100 then
-		local vm = minetest.get_voxel_manip()
-		local emin,emax = vm:read_from_map(block_buffer_p1,block_buffer_p2)
-		local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
-		local data = vm:get_data()
-		local param2 = vm:get_param2_data()
+		local vm = minetest.get_voxel_manip(block_buffer_p1,block_buffer_p2)
 		for i=1,#block_buffer do
-			local datum = block_buffer[i]
-			local index = area:index(datum.pos.x, datum.pos.y, datum.pos.z)
-			data[index] = minetest.get_content_id(datum.node.name)
-			param2[index] = datum.node.param2
+                        vm:set_node_at(block_buffer[i].pos, block_buffer[i].node)
 		end
-		vm:set_data(data)
-		vm:set_param2_data(param2)
 		vm:update_liquids()
 		vm:write_to_map()
 		vm:update_map()
