@@ -142,10 +142,12 @@ minetest.register_globalstep(function(dtime)
               end
             end
          end
-       end
+		end
 
-       if finished then break end
+		if finished then break end
     end
+	
+	flush_block_buffer()
 end)
 
 local old_is_protected = minetest.is_protected
@@ -260,7 +262,7 @@ function python(name, args, kill_script)
 	if not script then return true end
 
 	if script:find("%.%.") then
-	   minetest.chat_send_all("Sandbox violation in script")
+	   minetest.chat_send_all("Sandbox violation in script name")
 	   return true
 	end
 
@@ -381,6 +383,68 @@ function get_height(x, z)
 	return -1025
 end
 
+local block_buffer = {}
+local block_buffer_p1 = {}
+local block_buffer_p2 = {}
+
+function flush_block_buffer()
+	if #block_buffer >= 100 then
+		local vm = minetest.get_voxel_manip()
+		local emin,emax = vm:read_from_map(block_buffer_p1,block_buffer_p2)
+		local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
+		local data = vm:get_data()
+		local param2 = vm:get_param2_data()
+		for i=1,#block_buffer do
+			local datum = block_buffer[i]
+			local index = area:index(datum.pos.x, datum.pos.y, datum.pos.z)
+			data[index] = minetest.get_content_id(datum.node.name)
+			param2[index] = datum.node.param2
+		end
+		vm:set_data(data)
+		vm:set_param2_data(param2)
+		vm:update_liquids()
+		vm:write_to_map()
+		vm:update_map()
+	else
+		for i=1,#block_buffer do
+			minetest.set_node(block_buffer[i].pos, block_buffer[i].node)
+		end
+	end
+	block_buffer = {}
+	block_buffer_p1 = {}
+	block_buffer_p2 = {}
+end
+
+local function buffered_set_node(pos, node)
+	-- ensure buffer cuboid is no more than about 10000 in size
+	local new_block_buffer_p1 = {x=block_buffer_p1.x,y=block_buffer_p1.y,z=block_buffer_p1.z}
+	local new_block_buffer_p2 = {x=block_buffer_p2.x,y=block_buffer_p2.y,z=block_buffer_p2.z}
+	if not block_buffer_p1.x or pos.x < block_buffer_p1.x then new_block_buffer_p1.x = pos.x end
+	if not block_buffer_p1.y or pos.y < block_buffer_p1.y then new_block_buffer_p1.y = pos.y end
+	if not block_buffer_p1.z or pos.z < block_buffer_p1.z then new_block_buffer_p1.z = pos.z end
+	if not block_buffer_p2.x or pos.x > block_buffer_p2.x then new_block_buffer_p2.x = pos.x end
+	if not block_buffer_p2.y or pos.y > block_buffer_p2.y then new_block_buffer_p2.y = pos.y end
+	if not block_buffer_p2.z or pos.z > block_buffer_p2.z then new_block_buffer_p2.z = pos.z end
+
+	if #block_buffer > 0 and (new_block_buffer_p2.x - new_block_buffer_p2.x + 1) *
+		 (new_block_buffer_p2.y - new_block_buffer_p2.y + 1) *
+		 (new_block_buffer_p2.z - new_block_buffer_p2.z + 1) > 10000 then
+
+		 flush_block_buffer()
+		 block_buffer_p1.x = pos.x
+		 block_buffer_p1.y = pos.y
+		 block_buffer_p1.z = pos.z
+		 block_buffer_p2.x = pos.x
+		 block_buffer_p2.y = pos.y
+		 block_buffer_p2.z = pos.z
+	else
+		block_buffer_p1 = new_block_buffer_p1
+		block_buffer_p2 = new_block_buffer_p2
+	end
+	
+	table.insert(block_buffer, {pos=pos, node=node})
+end
+
 local function set_nodes_with_voxelmanip(x1,y1,z1,x2,y2,z2,node)
 	local p1 = {x=x1,y=y1,z=z1}
 	local p2 = {x=x2,y=y2,z=z2}
@@ -408,7 +472,7 @@ local function setNodes(args, node)
 	local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
 	local z1 = math.min(-tonumber(args[3]),-tonumber(args[6]))
 	local z2 = math.max(-tonumber(args[3]),-tonumber(args[6]))
-	if ((x2+1-x1)*(y2+1-y1)*(z2+1-z1) > 100) then
+	if ((x2+1-x1)*(y2+1-y1)*(z2+1-z1) >= 100) then
 		set_nodes_with_voxelmanip(x1,y1,z1,x2,y2,z2,node)
 		return
 	end
@@ -424,11 +488,11 @@ end
 function handle_world(cmd, args)
     if cmd == "setBlock" then
         local node = parse_node(args, 4)
-        minetest.set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])},node)
+        buffered_set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])},node)
     elseif cmd == "setNode" then
         local node = {name=args[4]}
         if args[5] then node.param2 = tonumber(args[5]) end
-        minetest.set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])},node)
+        buffered_set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])},node)
     elseif cmd == "setBlocks" then
         local node = parse_node(args, 7)
 		setNodes(args, node)
@@ -521,6 +585,11 @@ end
 function handle_command(line)
     local cmd, argtext = line:match("^([^(]+)%((.*)%)")
     if not cmd then return end
+
+    if #block_buffer > 0 and cmd ~= "world.setBlock" and cmd ~= "world.setNode" then
+        flush_block_buffer()
+    end
+
     local args = {}
     for arg in argtext:gmatch("([^,]+)") do
         table.insert(args, arg)
