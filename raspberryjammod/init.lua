@@ -381,6 +381,45 @@ function get_height(x, z)
 	return -1025
 end
 
+local function set_nodes_with_voxelmanip(x1,y1,z1,x2,y2,z2,node)
+	local p1 = {x=x1,y=y1,z=z1}
+	local p2 = {x=x2,y=y2,z=z2}
+	local vm = minetest.get_voxel_manip()
+	local emin,emax = vm:read_from_map(p1,p2)
+	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
+	local data = vm:get_data()
+	local param2 = vm:get_param2_data()
+	local content = minetest.get_content_id(node.name)
+	for index in area:iterp(p1,p2) do
+		data[index] = content
+		param2[index] = node.param2
+	end
+	vm:set_data(data)
+	vm:set_param2_data(param2)
+	vm:update_liquids()
+	vm:write_to_map(data)
+end
+
+local function setNodes(args, node)
+	local x1 = math.min(tonumber(args[1]),tonumber(args[4]))
+	local x2 = math.max(tonumber(args[1]),tonumber(args[4]))
+	local y1 = math.min(tonumber(args[2]),tonumber(args[5]))
+	local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
+	local z1 = math.min(-tonumber(args[3]),-tonumber(args[6]))
+	local z2 = math.max(-tonumber(args[3]),-tonumber(args[6]))
+	if ((x2+1-x1)*(y2+1-y1)*(z2+1-z1) > 100) then
+		set_nodes_with_voxelmanip(x1,y1,z1,x2,y2,z2,node)
+		return
+	end
+	for ycoord = y1,y2 do
+		for xcoord = x1,x2 do
+			for zcoord = z1,z2 do
+			   minetest.set_node({x=xcoord,y=ycoord,z=zcoord},node)
+			end
+		end
+	end
+end
+
 function handle_world(cmd, args)
     if cmd == "setBlock" then
         local node = parse_node(args, 4)
@@ -391,35 +430,10 @@ function handle_world(cmd, args)
         minetest.set_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])},node)
     elseif cmd == "setBlocks" then
         local node = parse_node(args, 7)
-        local x1 = math.min(tonumber(args[1]),tonumber(args[4]))
-        local x2 = math.max(tonumber(args[1]),tonumber(args[4]))
-        local y1 = math.min(tonumber(args[2]),tonumber(args[5]))
-        local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
-        local z1 = math.min(-tonumber(args[3]),-tonumber(args[6]))
-        local z2 = math.max(-tonumber(args[3]),-tonumber(args[6]))
-        for ycoord = y1,y2 do
-          for xcoord = x1,x2 do
-            for zcoord = z1,z2 do
-               minetest.set_node({x=xcoord,y=ycoord,z=zcoord},node)
-            end
-          end
-        end
+		setNodes(args, node)
     elseif cmd == "setNodes" then
         local node = {name=args[7]}
-        if args[8] then node.param2 = tonumber(args[8]) end
-        local x1 = math.min(tonumber(args[1]),tonumber(args[4]))
-        local x2 = math.max(tonumber(args[1]),tonumber(args[4]))
-        local y1 = math.min(tonumber(args[2]),tonumber(args[5]))
-        local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
-        local z1 = math.min(-tonumber(args[3]),-tonumber(args[6]))
-        local z2 = math.max(-tonumber(args[3]),-tonumber(args[6]))
-        for ycoord = y1,y2 do
-          for xcoord = x1,x2 do
-            for zcoord = z1,z2 do
-               minetest.set_node({x=xcoord,y=ycoord,z=zcoord},node)
-            end
-          end
-        end
+		setNodes(args, node)
     elseif cmd == "getNode" then
         local node = minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])})
         return node.name .. "," .. node.param2
