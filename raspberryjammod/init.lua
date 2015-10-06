@@ -110,12 +110,15 @@ minetest.register_globalstep(function(dtime)
            minetest.log("action", "RJM websocket client attempting handshake")
         end
     end
+
+    local command_count = 1000
+
     for i = 1, #socket_client_list do
        err = false
        local line
        local finished = false
 
-       while not err do
+       while not err and not finished do
          local source = socket_client_list[i]
          line,err = source.client:receive(source.read_mode)
          if err == "closed" then
@@ -132,6 +135,11 @@ minetest.register_globalstep(function(dtime)
               end
               finished = true
               err = "handling"
+            else
+              command_count = command_count - 1
+              if command_count < 0 then
+                 finished = true
+              end
             end
          end
        end
