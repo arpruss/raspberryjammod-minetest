@@ -397,7 +397,8 @@ local function set_nodes_with_voxelmanip(x1,y1,z1,x2,y2,z2,node)
 	vm:set_data(data)
 	vm:set_param2_data(param2)
 	vm:update_liquids()
-	vm:write_to_map(data)
+	vm:write_to_map()
+	vm:update_map()
 end
 
 local function setNodes(args, node)
@@ -433,6 +434,7 @@ function handle_world(cmd, args)
 		setNodes(args, node)
     elseif cmd == "setNodes" then
         local node = {name=args[7]}
+        if args[8] then node.param2 = tonumber(args[8]) end
 		setNodes(args, node)
     elseif cmd == "getNode" then
         local node = minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])})
