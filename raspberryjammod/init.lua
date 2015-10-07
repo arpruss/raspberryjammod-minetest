@@ -64,8 +64,21 @@ if ws == nil then
     update_settings = true
     settings:set("support_websockets", tostring(ws))
 end
-
 if update_settings then settings:write() end
+
+local settings = Settings(mypath .. "override.conf")
+local x = settings:get("python")
+if x ~= nil then
+   python_interpreter = x
+end
+x = settings:get_bool("restrict_to_local_connections")
+if x ~= nil then
+   local_only = x
+end
+x = settings:get_bool("support_websockets")
+if x ~= nil then
+   ws = x 
+end
 
 local remote_address
 if local_only then
@@ -267,7 +280,8 @@ function python(name, args, kill_script)
 	end
 
 	script_running = true
-	background_launch(script_window_id, '"' .. python_interpreter .. '" "' .. mypath .. path_separator .. "mcpipy" .. path_separator .. script .. '.py" ' .. argtext)
+	local mcpipy_path = mypath .. path_separator .. "mcpipy" .. path_separator
+	background_launch(script_window_id, mcpipy_path, '"' .. python_interpreter .. '" "' .. mcpipy_path .. script .. '.py" ' .. argtext)
     return true
  end
 
@@ -564,10 +578,10 @@ function handle_events(cmd, args)
     return nil
 end
 
-function background_launch(window_identifier, cmd)
+function background_launch(window_identifier, working_dir, cmd)
     -- TODO: non-Windows
     if not is_windows then return false end
-    local cmdline = 'start "' .. window_identifier .. '" /MIN ' .. cmd
+    local cmdline = 'start "' .. window_identifier .. '" /D "' .. working_dir .. '" /MIN ' .. cmd
     minetest.log("action", "launching ["..cmdline.."]")
     ie.os.execute(cmdline)
 end
