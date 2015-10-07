@@ -35,6 +35,7 @@ block.GOLD_ORE           =Block(14)
 block.IRON_ORE           =Block(15)
 block.COAL_ORE           =Block(16)
 block.WOOD               =Block(17)
+block.WOOD2              =Block(162)
 block.LEAVES             =Block(18)
 block.GLASS              =Block(20)
 block.LAPIS_LAZULI_ORE   =Block(21)
@@ -232,7 +233,7 @@ translate(block.GRAVEL,"default:gravel")
 translate(block.GOLD_ORE,"default:stone_with_gold")
 translate(block.IRON_ORE,"default:stone_with_iron")
 translate(block.COAL_ORE,"default:stone_with_coal")
-translate(block.WOOD,"default:wood")
+translate(block.WOOD,"default:tree")
 translate(block.LEAVES,"default:leaves")
 translate(block.GLASS,"default:glass")
 translate(block.LAPIS_LAZULI_ORE,"wool:blue") -- fix
@@ -492,12 +493,26 @@ defineStair(164, "stairs:stair_wood") -- fix: dark oak
 defineStair(180, "stairs:stair_sandstone") -- fix: red sandstone
 defineStair(203, "stairs:stair_wood") -- fix: purpur
 
+local function defineWood(main, subtype, node_name)
+	translate(Block(main, subtype), node_name)
+	translate(Block(main, subtype + 1 * 4), node_name, 12)
+	translate(Block(main, subtype + 2 * 4), node_name, 4)
+	translate(Block(main, subtype + 3 * 4), node_name) -- fix: all bark
+end
+
+defineWood(block.WOOD, 0, "default:tree") -- oak
+defineWood(block.WOOD, 1, "default:pine_tree") -- spruce
+defineWood(block.WOOD, 2, "default:tree") -- fix: birch
+defineWood(block.WOOD, 3, "default:jungletree")
+defineWood(block.WOOD2, 0, "default:acacia_tree")
+defineWood(block.WOOD2, 1, "default:tree") -- fix: dark oak
+
 
 function block.node_to_id_meta(node)
 	if node.name == "air" or node.name == "ignore" then
-		return "0"
+		return 0,0
 	end
-    local entry=node.name .. " " .. node.param2
+        local entry=node.name .. " " .. node.param2
 	if from_node[entry] then
 		return unBlock(from_node[entry])
 	end
