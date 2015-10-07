@@ -1,4 +1,4 @@
-﻿#
+#
 # Code under the MIT license by Alexander Pruss
 #
 
