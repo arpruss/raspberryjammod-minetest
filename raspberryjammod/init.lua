@@ -521,6 +521,12 @@ function handle_world(cmd, args)
     elseif cmd == "getNode" then
         local node = minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])})
         return node.name .. "," .. node.param2
+    elseif cmd == "getAllNodes" then
+        local nodes = {}
+        for name,_ in pairs(minetest.registered_nodes) do
+            table.insert(nodes,name)
+        end
+        return table.concat(nodes,'|')
     elseif cmd == "getBlockWithData" or cmd == "getBlock" then
         local node = minetest.get_node({x=tonumber(args[1]),y=tonumber(args[2]),z=-tonumber(args[3])})
         local id, meta = block.node_to_id_meta(node)
