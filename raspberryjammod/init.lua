@@ -388,7 +388,7 @@ local block_buffer_p1 = {}
 local block_buffer_p2 = {}
 
 function flush_block_buffer()
-	if #block_buffer >= 10 then
+	if #block_buffer >= 50 then
 		local vm = minetest.get_voxel_manip()
     	        local emin,emax = vm:read_from_map(block_buffer_p1,block_buffer_p2)
     	        local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
@@ -473,10 +473,10 @@ local function setNodes(args, node)
 	local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
 	local z1 = math.min(-tonumber(args[3]),-tonumber(args[6]))
 	local z2 = math.max(-tonumber(args[3]),-tonumber(args[6]))
-	
-	local volume = (x2+1-x1)*(y2+1-y1)*(z2+1-z1) 
 
-	if 100 <= volume and volume <= 20000000 then
+	local volume = (x2+1-x1)*(y2+1-y1)*(z2+1-z1)
+
+	if 50 <= volume and volume <= 20000000 then
 		set_nodes_with_voxelmanip(x1,y1,z1,x2,y2,z2,node)
 	else
 		for ycoord = y1,y2 do
