@@ -146,7 +146,7 @@ minetest.register_globalstep(function(dtime)
 
 		if finished then break end
     end
-	
+
 	flush_block_buffer()
 end)
 
@@ -241,11 +241,11 @@ minetest.register_chatcommand("python",
 minetest.register_chatcommand("apy",
 	{params="[<script> [<args>]]" ,
 	description="Run python script in raspberryjammod/mcpipy directory, without killing any previous script",
-	func = function(name, args) python(name, args, true) end })
-minetest.register_chatcommand("apython",
+	func = function(name, args) python(name, args, false) end })
+minetest.register_chatcommand("addpython",
 	{params="[<script> [<args>]]" ,
 	description="Run python script in raspberryjammod/mcpipy directory, without killing any previous script",
-	func = function(name, args) python(name, args, true) end })
+	func = function(name, args) python(name, args, false) end })
 
 function python(name, args, kill_script)
 	if (kill_script and script_running) then
@@ -388,11 +388,20 @@ local block_buffer_p1 = {}
 local block_buffer_p2 = {}
 
 function flush_block_buffer()
-	if #block_buffer >= 100 then
-		local vm = minetest.get_voxel_manip(block_buffer_p1,block_buffer_p2)
+	if #block_buffer >= 10 then
+		local vm = minetest.get_voxel_manip()
+    	        local emin,emax = vm:read_from_map(block_buffer_p1,block_buffer_p2)
+    	        local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
+    	        local data = vm:get_data()
+    	        local param2 = vm:get_param2_data()
 		for i=1,#block_buffer do
-                        vm:set_node_at(block_buffer[i].pos, block_buffer[i].node)
+                        local v = block_buffer[i]
+                        local index = area:indexp(v.pos)
+                        data[index] = minetest.get_content_id(v.node.name)
+                        param2[index] = v.node.param2
 		end
+    	        vm:set_data(data)
+                vm:set_param2_data(param2)
 		vm:update_liquids()
 		vm:write_to_map()
 		vm:update_map()
@@ -408,6 +417,7 @@ end
 
 local function buffered_set_node(pos, node)
 	-- ensure buffer cuboid is no more than about 10000 in size
+
 	local new_block_buffer_p1 = {x=block_buffer_p1.x,y=block_buffer_p1.y,z=block_buffer_p1.z}
 	local new_block_buffer_p2 = {x=block_buffer_p2.x,y=block_buffer_p2.y,z=block_buffer_p2.z}
 	if not block_buffer_p1.x or pos.x < block_buffer_p1.x then new_block_buffer_p1.x = pos.x end
@@ -432,7 +442,7 @@ local function buffered_set_node(pos, node)
 		block_buffer_p1 = new_block_buffer_p1
 		block_buffer_p2 = new_block_buffer_p2
 	end
-	
+
 	table.insert(block_buffer, {pos=pos, node=node})
 end
 
