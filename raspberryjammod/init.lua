@@ -287,7 +287,7 @@ function python(name, args, kill_script)
 
 minetest.register_on_chat_message(function(name, message)
     local id = get_player_id_by_name(name)
-    table.insert(chat_record, id .. "," .. message:gsub("%|", "&#124;"))
+    table.insert(chat_record, id .. "," .. sanitize_pipe(message))
     return false
 end)
 
@@ -316,6 +316,10 @@ function get_entity_id(entity)
     else
        return get_player_id(entity)
     end
+end
+
+local function sanitize_pipe(s)
+	return s:gsub("%&", "&amp;"):gsub("%|", "&#124;")
 end
 
 function handle_entity(cmd, id, args)
@@ -524,7 +528,7 @@ function handle_world(cmd, args)
     elseif cmd == "getAllNodes" then
         local nodes = {}
         for name,_ in pairs(minetest.registered_nodes) do
-            table.insert(nodes,name)
+            table.insert(nodes,sanitize_pipe(name))
         end
         return table.concat(nodes,'|')
     elseif cmd == "getBlockWithData" or cmd == "getBlock" then
@@ -535,6 +539,53 @@ function handle_world(cmd, args)
         else
             return id..","..meta
         end
+    elseif cmd == "getBlocksWithData" or cmd == "getBlocks" or cmd == "getNodes" then
+		local x1 = tonumber(args[1])
+		local y1 = tonumber(args[2])
+		local z1 = -tonumber(args[3])
+		local x2 = tonumber(args[4])
+		local y2 = tonumber(args[5])
+		local z2 = -tonumber(args[6])
+		
+		local dx,dy,dz
+		if x1 <= x2 then dx = 1 else dx = -1 end
+		if y1 <= y2 then dy = 1 else dy = -1 end
+		if z1 <= z2 then dz = 1 else dz = -1 end
+		
+		local data = {}
+		
+		if cmd == "getBlocksWithData" then 
+			for x = x1,x2,dx do
+				for y = y1,y2,dy do
+					for z = z1,z2,dz do
+						local node = minetest.get_node({x=x,y=y,z=z})
+						local id, meta = block.node_to_id_meta(node)
+						table.insert(data, id .. "," .. meta)
+					end
+				end
+			end
+		elseif cmd == "getNodes" then
+			for x = x1,x2,dx do
+				for y = y1,y2,dy do
+					for z = z1,z2,dz do
+						local node = minetest.get_node({x=x,y=y,z=z})
+						table.insert(data, sanitize_pipe(node.name) .. "," .. node.param2)
+					end
+				end
+			end
+		else
+			for x = x1,x2,dx do
+				for y = y1,y2,dy do
+					for z = z1,z2,dz do
+						local node = minetest.get_node({x=x,y=y,z=z})
+						local id, _ = block.node_to_id_meta(node)
+						table.insert(data, tostring(id))
+					end
+				end
+			end
+		end
+		
+        return table.concat(data, "|")
     elseif cmd == "getHeight" then
 	    return tonumber(get_height(tonumber(args[1]),-tonumber(args[2])))
     elseif cmd == "getPlayerId" then
