@@ -406,20 +406,20 @@ local block_buffer_p1 = {}
 local block_buffer_p2 = {}
 
 function flush_block_buffer()
-	if #block_buffer >= 50 then
+	if #block_buffer >= 1 then
 		local vm = minetest.get_voxel_manip()
-    	        local emin,emax = vm:read_from_map(block_buffer_p1,block_buffer_p2)
-    	        local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
-    	        local data = vm:get_data()
-    	        local param2 = vm:get_param2_data()
+		local emin,emax = vm:read_from_map(block_buffer_p1,block_buffer_p2)
+		local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
+		local data = vm:get_data()
+		local param2 = vm:get_param2_data()
 		for i=1,#block_buffer do
-                        local v = block_buffer[i]
-                        local index = area:indexp(v.pos)
-                        data[index] = minetest.get_content_id(v.node.name)
-                        param2[index] = v.node.param2
+			local v = block_buffer[i]
+			local index = area:indexp(v.pos)
+			data[index] = minetest.get_content_id(v.node.name)
+			param2[index] = v.node.param2
 		end
-    	        vm:set_data(data)
-                vm:set_param2_data(param2)
+		vm:set_data(data)
+		vm:set_param2_data(param2)
 		vm:update_liquids()
 		vm:write_to_map()
 		vm:update_map()
@@ -540,24 +540,19 @@ function handle_world(cmd, args)
             return id..","..meta
         end
     elseif cmd == "getBlocksWithData" or cmd == "getBlocks" or cmd == "getNodes" then
-		local x1 = tonumber(args[1])
-		local y1 = tonumber(args[2])
-		local z1 = -tonumber(args[3])
-		local x2 = tonumber(args[4])
-		local y2 = tonumber(args[5])
-		local z2 = -tonumber(args[6])
-		
-		local dx,dy,dz
-		if x1 <= x2 then dx = 1 else dx = -1 end
-		if y1 <= y2 then dy = 1 else dy = -1 end
-		if z1 <= z2 then dz = 1 else dz = -1 end
+		local x1 = math.min(tonumber(args[1]),tonumber(args[4]))
+		local x2 = math.max(tonumber(args[1]),tonumber(args[4]))
+		local y1 = math.min(tonumber(args[2]),tonumber(args[5]))
+		local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
+		local z1 = math.min(-tonumber(args[3]),-tonumber(args[6]))
+		local z2 = math.max(-tonumber(args[3]),-tonumber(args[6]))
 		
 		local data = {}
 		
 		if cmd == "getBlocksWithData" then 
-			for x = x1,x2,dx do
-				for y = y1,y2,dy do
-					for z = z1,z2,dz do
+			for y = y1,y2 do
+				for x = x1,x2 do
+					for z = z1,z2 do
 						local node = minetest.get_node({x=x,y=y,z=z})
 						local id, meta = block.node_to_id_meta(node)
 						table.insert(data, id .. "," .. meta)
@@ -585,7 +580,11 @@ function handle_world(cmd, args)
 			end
 		end
 		
-        return table.concat(data, "|")
+		if cmd == "getBlocks" then
+			return table.concat(data, ",")
+		else
+			return table.concat(data, "|")
+		end
     elseif cmd == "getHeight" then
 	    return tonumber(get_height(tonumber(args[1]),-tonumber(args[2])))
     elseif cmd == "getPlayerId" then
@@ -853,3 +852,6 @@ function handle_websocket_header(source,line)
     return nil
 end
 
+--minetest.register_on_generated(function(minp, maxp, seed)
+--	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
+--end)
