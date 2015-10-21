@@ -560,18 +560,18 @@ function handle_world(cmd, args)
 				end
 			end
 		elseif cmd == "getNodes" then
-			for x = x1,x2,dx do
-				for y = y1,y2,dy do
-					for z = z1,z2,dz do
+			for y = y1,y2 do
+				for x = x1,x2 do
+					for z = z1,z2 do
 						local node = minetest.get_node({x=x,y=y,z=z})
 						table.insert(data, sanitize_pipe(node.name) .. "," .. node.param2)
 					end
 				end
 			end
 		else
-			for x = x1,x2,dx do
-				for y = y1,y2,dy do
-					for z = z1,z2,dz do
+			for y = y1,y2 do
+				for x = x1,x2 do
+					for z = z1,z2 do
 						local node = minetest.get_node({x=x,y=y,z=z})
 						local id, _ = block.node_to_id_meta(node)
 						table.insert(data, tostring(id))
