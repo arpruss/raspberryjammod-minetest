@@ -851,7 +851,3 @@ function handle_websocket_header(source,line)
 
     return nil
 end
-
---minetest.register_on_generated(function(minp, maxp, seed)
---	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
---end)
