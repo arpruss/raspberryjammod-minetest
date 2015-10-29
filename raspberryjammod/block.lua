@@ -1,20 +1,12 @@
-if minetest.request_insecure_environment then
-   ie=minetest.request_insecure_environment()
-else
-   ie=_G
-end
-
-local bit=ie.require("bit")
-
 local block={}
 
 local function Block(id,meta)
-    if meta == nil then meta=0 end
-    return meta * 0x1000 + id
+	if meta == nil then meta=0 end
+	return meta * 0x1000 + id
 end
 
 local function unBlock(value)
-    return bit.band(value, 0xFFF),bit.rshift(value, 12)
+	return value % 0x1000, math.floor(value / 0x1000)
 end
 
 block.AIR                =Block(0)
