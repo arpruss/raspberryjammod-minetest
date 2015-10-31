@@ -4,7 +4,12 @@ else
    ie = _G
 end
 
-local bit = ie.require 'bit'
+local bit
+local status,err = pcall(function() bit = ie.require 'bit' end)
+if not status then
+	bit = ie.dofile(minetest.get_modpath(minetest.get_current_modname()) .. '/slowbit32.lua')
+end
+
 local rol = bit.rol
 local bxor = bit.bxor
 local bor = bit.bor

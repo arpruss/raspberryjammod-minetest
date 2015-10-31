@@ -21,8 +21,6 @@ if not status then
    socket = ie.require("socket.cx64")
 end
 
-ie.module("socket")
-
 -----------------------------------------------------------------------------
 -- Exported auxiliar functions
 -----------------------------------------------------------------------------
@@ -49,7 +47,7 @@ function bind(host, port, backlog)
     return sock
 end
 
-try = newtry()
+-- try = newtry()
 
 function choose(table)
     return function(name, opt1, opt2)
@@ -141,3 +139,4 @@ sourcet["default"] = sourcet["until-closed"]
 
 source = choose(sourcet)
 
+return { connect=connect, bind=bind, choose=choose, source=source }

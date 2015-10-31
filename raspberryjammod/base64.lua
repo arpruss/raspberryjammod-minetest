@@ -58,8 +58,11 @@ local Base64 = {}
 -- Imports
 ----------------------------------------------------------------------------
 
-bit = ie.require("bit")
-
+local bit
+local status,err = pcall(function() bit = ie.require 'bit' end)
+if not status then
+	bit = ie.dofile(minetest.get_modpath(minetest.get_current_modname()) .. '/slowbit32.lua')
+end
 local band, bor, lshift, rshift = bit.band, bit.bor, bit.lshift, bit.rshift
 
 ----------------------------------------------------------------------------

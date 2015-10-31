@@ -87,13 +87,16 @@ else
     remote_address = "*"
 end
 
-local server = socket.bind(remote_address, 4711)
+local server,err = socket.bind(remote_address, 4711)
+assert(server, err)
+
 server:setoption('tcp-nodelay',true)
 server:settimeout(0)
 
 local ws_server = nil
 
 if ws then
+	if not bit or not bit.bxor then bit = ie.require("slowbit32") end
     tools = ie.require("tools")
     base64 = ie.require("base64")
     ws_server = socket.bind(remote_address, 14711)
@@ -285,6 +288,10 @@ function python(name, args, kill_script)
     return true
  end
 
+local function sanitize_pipe(s)
+	return s:gsub("%&", "&amp;"):gsub("%|", "&#124;")
+end
+
 minetest.register_on_chat_message(function(name, message)
     local id = get_player_id_by_name(name)
     table.insert(chat_record, id .. "," .. sanitize_pipe(message))
@@ -316,10 +323,6 @@ function get_entity_id(entity)
     else
        return get_player_id(entity)
     end
-end
-
-local function sanitize_pipe(s)
-	return s:gsub("%&", "&amp;"):gsub("%|", "&#124;")
 end
 
 function handle_entity(cmd, id, args)
@@ -665,8 +668,8 @@ function handle_command(line)
     end
 
     local args = {}
-    for arg in argtext:gmatch("([^,]+)") do
-        table.insert(args, arg)
+    for argument in argtext:gmatch("([^,]+)") do
+        table.insert(args, argument)
     end
     if cmd:sub(1,6) == "world." then
         return handle_world(cmd:sub(7),args)
