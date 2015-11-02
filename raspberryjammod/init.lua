@@ -547,8 +547,8 @@ function handle_world(cmd, args)
 		local x2 = math.max(tonumber(args[1]),tonumber(args[4]))
 		local y1 = math.min(tonumber(args[2]),tonumber(args[5]))
 		local y2 = math.max(tonumber(args[2]),tonumber(args[5]))
-		local z1 = math.min(-tonumber(args[3]),-tonumber(args[6]))
-		local z2 = math.max(-tonumber(args[3]),-tonumber(args[6]))
+		local z1 = math.min(tonumber(args[3]),tonumber(args[6]))
+		local z2 = math.max(tonumber(args[3]),tonumber(args[6]))
 		
 		local data = {}
 		
@@ -556,7 +556,7 @@ function handle_world(cmd, args)
 			for y = y1,y2 do
 				for x = x1,x2 do
 					for z = z1,z2 do
-						local node = minetest.get_node({x=x,y=y,z=z})
+						local node = minetest.get_node({x=x,y=y,z=-z})
 						local id, meta = block.node_to_id_meta(node)
 						table.insert(data, id .. "," .. meta)
 					end
@@ -566,7 +566,7 @@ function handle_world(cmd, args)
 			for y = y1,y2 do
 				for x = x1,x2 do
 					for z = z1,z2 do
-						local node = minetest.get_node({x=x,y=y,z=z})
+						local node = minetest.get_node({x=x,y=y,z=-z})
 						table.insert(data, sanitize_pipe(node.name) .. "," .. node.param2)
 					end
 				end
@@ -575,7 +575,7 @@ function handle_world(cmd, args)
 			for y = y1,y2 do
 				for x = x1,x2 do
 					for z = z1,z2 do
-						local node = minetest.get_node({x=x,y=y,z=z})
+						local node = minetest.get_node({x=x,y=y,z=-z})
 						local id, _ = block.node_to_id_meta(node)
 						table.insert(data, tostring(id))
 					end
