@@ -6,7 +6,7 @@ local two32 = 2^32
 local to_binary = function(x)
 	local pos = two31
 	local a = ""
-	if x < 0 then	
+	if x < 0 then
 		x = x + two32
 	end
 	x = x % two32
@@ -23,7 +23,7 @@ local to_binary = function(x)
 end
 
 local from_binary = function(x)
-	local z = tonumber(x)
+	local z = tonumber(x,2)
 	if z >= two31 then
 		return z - two32
 	else
