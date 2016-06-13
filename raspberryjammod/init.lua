@@ -674,6 +674,10 @@ function handle_command(line)
     if cmd:sub(1,6) == "world." then
         return handle_world(cmd:sub(7),args)
     elseif cmd:sub(1,7) == "player." then
+        if args[1] == "None" then
+            -- Compatibility with mcpi library included with RaspberryJuice --
+            table.remove(args,1) 
+        end
         return handle_entity(cmd:sub(8),nil,args)
     elseif cmd:sub(1,7) == "entity." then
         local player = tonumber(args[1])
