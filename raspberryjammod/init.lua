@@ -1,4 +1,4 @@
--- TODO: test multiplayer functionality
+--  TODO: test multiplayer functionality
 --
 -- Note: The x-coordinate is reversed in sign between minetest and minecraft,
 -- and the API compensates for this.
@@ -363,7 +363,7 @@ function handle_entity(cmd, id, args)
         -- values differ by pi/2. Ideally, the mod
         -- would detect this to make sure that if it's fixed in the next version
         -- this wouldn't be an issue.
-        entity:set_look_yaw(180 + (-tonumber(args[1])) * math.pi / 180)
+        entity:set_look_yaw((180-tonumber(args[1])) * math.pi / 180)
     elseif cmd == "setDirection" then
         -- TODO: Fix set_look_yaw() and get_look_yaw() compensation.
         local x = tonumber(args[1])
