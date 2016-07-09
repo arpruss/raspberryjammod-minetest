@@ -1,4 +1,4 @@
-﻿#
+#
 # Code under the MIT license by Alexander Pruss
 #
 
@@ -105,4 +105,4 @@ while True:
     if t > path[-1][0]:
         break
 
-mc.setBlock(path[-1][1],REDSTONE_BLOCK)
+mc.setBlock(path[-1][1],FIRE)

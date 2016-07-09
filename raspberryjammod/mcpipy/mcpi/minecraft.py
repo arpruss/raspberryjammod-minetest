@@ -5,6 +5,7 @@ from block import Block
 import math
 from os import environ
 from util import flatten,floorFlatten
+import security
 
 """ Minecraft PI low level api v0.1_1
 
@@ -185,16 +186,34 @@ class Minecraft:
         else:
             self.conn = Connection()
 
+        if security.AUTHENTICATION_USERNAME and security.AUTHENTICATION_PASSWORD:
+            self.conn.authenticate(security.AUTHENTICATION_USERNAME, security.AUTHENTICATION_PASSWORD)
+
         self.camera = CmdCamera(self.conn)
         self.entity = CmdEntity(self.conn)
+        
+        self.playerId = None
+        
         if autoId:
             try:
-                 playerId = int(environ['MINECRAFT_PLAYER_ID'])
-                 self.player = CmdPlayer(self.conn,playerId=playerId)
+                 self.playerId = int(environ['MINECRAFT_PLAYER_ID'])
+                 self.player = CmdPlayer(self.conn,playerId=self.playerId)
             except:
-                 self.player = CmdPlayer(self.conn)
+                try:
+                    self.playerId = self.getPlayerId(environ['MINECRAFT_PLAYER_NAME'])
+                    self.player = CmdPlayer(self.conn,playerId=self.playerId)
+                except:
+                    if security.AUTHENTICATION_USERNAME:
+                        try:
+                            self.playerId = self.getPlayerId(security.AUTHENTICATION_USERNAME)
+                            self.player = CmdPlayer(self.conn,playerId=self.playerId)
+                        except:
+                            self.player = CmdPlayer(self.conn)
+                    else:
+                        self.player = CmdPlayer(self.conn)
         else:
             self.player = CmdPlayer(self.conn)
+        
         self.events = CmdEvents(self.conn)
         self.enabledNBT = False
 
@@ -320,7 +339,11 @@ class Minecraft:
 
     def getPlayerId(self, *args):
         """Get the id of the current player"""
-        return int(self.conn.sendReceive_flat("world.getPlayerId", floorFlatten(args)))
+        a = tuple(flatten(args))
+        if self.playerId is not None and len(a) == 0:
+            return self.playerId
+        else:
+            return int(self.conn.sendReceive_flat("world.getPlayerId", flatten(args)))
 
     def getPlayerEntityIds(self):
         """Get the entity ids of the connected players => [id:int]"""

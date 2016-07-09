@@ -1,4 +1,8 @@
 #
+# WARNING: If you're running RJM on a server, do NOT include this script server-side for security reasons.
+#
+
+#
 # Code under the MIT license by Alexander Pruss
 #
 #
@@ -28,6 +32,8 @@ def inputLine(prompt):
                     return 'quit()'
                 elif c.message == ' ':
                     return ''
+                elif "__" in c.message:
+                    sys.exit();
                 else:
                     return c.message
         time.sleep(0.2)
