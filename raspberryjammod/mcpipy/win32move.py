@@ -55,7 +55,7 @@ while True:
             else:
                 drew = None
             mc.entity.setPos(entity,pos)
-            if lastPlatform != under:
+            if lastPlatform is not None and lastPlatform != under:
                 mc.setBlock(lastPlatform,AIR)
                 lastPlatform = None
             if drew:
