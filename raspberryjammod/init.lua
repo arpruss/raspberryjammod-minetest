@@ -212,7 +212,7 @@ minetest.register_on_punchnode(function(pos, oldnode, puncher, pointed_thing)
     if (puncher:is_player()) then
        local item = puncher:get_wielded_item()
        if not restrict_to_sword or (item and item:get_name():find("%:sword")) then
-          table.insert(block_hits, pos.x..","..pos.y..","..(-pos.z)..",7,"..get_entity_id(puncher))
+          table.insert(block_hits, pos.x..","..pos.y..","..(-pos.z)..","..block.node_to_id_meta(oldnode)..","..get_entity_id(puncher))
        end
     end
 end)
