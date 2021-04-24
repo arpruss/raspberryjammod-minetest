@@ -284,7 +284,7 @@ function python(name, args, kill_script)
 
 	script_running = true
 	local mcpipy_path = mypath .. path_separator .. "mcpipy" .. path_separator
-	background_launch(script_window_id, mcpipy_path, '"' .. python_interpreter .. '" "' .. mcpipy_path .. script .. '.py" ' .. argtext)
+	background_launch(script_window_id, mcpipy_path, python_interpreter .. ' ' .. mcpipy_path .. script .. '.py ' .. argtext)
     return true
  end
 
@@ -638,17 +638,26 @@ function handle_events(cmd, args)
 end
 
 function background_launch(window_identifier, working_dir, cmd)
-    -- TODO: non-Windows
-    if not is_windows then return false end
-    local cmdline = 'start "' .. window_identifier .. '" /D "' .. working_dir .. '" /MIN ' .. cmd
-    minetest.log("action", "launching ["..cmdline.."]")
-    ie.os.execute(cmdline)
+    if  is_windows then 
+       local cmdline = 'start "' .. window_identifier .. '" /D "' .. working_dir .. '" /MIN "' .. cmd .. '" '
+       minetest.log("action", "launching ["..cmdline.."]")
+       ie.os.execute(cmdline)
+    else
+       local cmdline = 'xterm -T "' .. window_identifier .. '" -e \' '  .. cmd .. ' \' & '
+       minetest.log("action", "launching ["..cmdline.."]")
+       ie.os.execute(cmdline)
+    end
 end
 
 function kill(window_identifier)
-    -- TODO: non-Windows
-    minetest.log('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
-    ie.os.execute('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
+   if is_window then
+      minetest.log('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
+      ie.os.execute('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
+   else
+      cmdline = 'pkill -9 -f "xterm -T ' .. window_identifier .. '" '
+      minetest.log(cmdline)
+      ie.os.execute(cmdline)
+   end
 end
 
 function safe_handle_command(source,line)
