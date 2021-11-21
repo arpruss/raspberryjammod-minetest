@@ -1,8 +1,8 @@
-if minetest.request_insecure_environment then
-   ie = minetest.request_insecure_environment()
-else
-   ie = _G
-end
+-- if minetest.request_insecure_environment then
+--   local ie = minetest.request_insecure_environment()
+-- else
+--    ie = _G
+-- end
 -----------------------------------------------------------------------------
 -- LuaSocket helper module
 -- Author: Diego Nehab
@@ -13,12 +13,17 @@ end
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
 local base = _G
-local string = ie.require("string")
-local math = ie.require("math")
-local socket
-local status,err = pcall(function() socket = ie.require("socket.core") end)
-if not status then
-   socket = ie.require("socket.cx64")
+local string = _G
+local math = _G
+local socket = _G
+
+function setup(ie)
+   string = ie.require("string")
+   math = ie.require("math")
+   local status,err = pcall(function() socket = ie.require("socket.core") end)
+   if not status then
+      socket = ie.require("socket.cx64")
+   end
 end
 
 -----------------------------------------------------------------------------
@@ -139,4 +144,4 @@ sourcet["default"] = sourcet["until-closed"]
 
 source = choose(sourcet)
 
-return { connect=connect, bind=bind, choose=choose, source=source }
+return { connect=connect, bind=bind, choose=choose, source=source, setup=setup }

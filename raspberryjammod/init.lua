@@ -3,11 +3,11 @@
 -- Note: The x-coordinate is reversed in sign between minetest and minecraft,
 -- and the API compensates for this.
 
-if minetest.request_insecure_environment then
-   ie = minetest.request_insecure_environment()
-else
-   ie = _G
-end
+-- if minetest.request_insecure_environment then
+   local ie = minetest.request_insecure_environment()
+-- else
+--    ie = _G
+-- end
 
 local source = ie.debug.getinfo(1).source:sub(2)
 -- Detect windows via backslashes in paths
@@ -32,6 +32,7 @@ end
 
 local block = ie.require("block")
 local socket = ie.require("socket")
+socket.setup(ie)
 
 local block_hits = {}
 local chat_record = {}
@@ -98,7 +99,9 @@ local ws_server = nil
 if ws then
 	if not bit or not bit.bxor then bit = ie.require("slowbit32") end
     tools = ie.require("tools")
+    tools.setup(ie)
     base64 = ie.require("base64")
+    base64.setup(ie)
     ws_server = socket.bind(remote_address, 14711)
     ws_server:setoption('tcp-nodelay',true)
     ws_server:settimeout(0)
@@ -283,7 +286,7 @@ function python(name, args, kill_script)
 	end
 
 	script_running = true
-	local mcpipy_path = mypath .. path_separator .. "mcpipy" .. path_separator
+	local mcpipy_path = mypath .. "mcpipy" .. path_separator
 	background_launch(script_window_id, mcpipy_path, '"' .. python_interpreter .. '" "' .. mcpipy_path .. script .. '.py" ' .. argtext)
     return true
  end
@@ -638,17 +641,26 @@ function handle_events(cmd, args)
 end
 
 function background_launch(window_identifier, working_dir, cmd)
-    -- TODO: non-Windows
-    if not is_windows then return false end
-    local cmdline = 'start "' .. window_identifier .. '" /D "' .. working_dir .. '" /MIN ' .. cmd
+    local cmdline 
+    if is_windows then
+    	cmdline = 'start "' .. window_identifier .. '" /D "' .. working_dir .. '" /MIN ' .. cmd
+    else
+	cmdline = "cd " .. working_dir .. " ; " .. cmd .. " &"
+    end
     minetest.log("action", "launching ["..cmdline.."]")
     ie.os.execute(cmdline)
 end
 
 function kill(window_identifier)
     -- TODO: non-Windows
-    minetest.log('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
-    ie.os.execute('taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"')
+    local cmd
+    if is_windows then
+    	cmd = 'taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"'
+    else
+        cmd = "kill `ps x | grep '\/mc[p]ipy\/' | grep -oe '^[0-9 ]*'`"
+    end
+    minetest.log(cmd)
+    ie.os.execute(cmd)
 end
 
 function safe_handle_command(source,line)

@@ -1,8 +1,8 @@
-if minetest.request_insecure_environment then
-   ie = minetest.request_insecure_environment()
-else
-   ie = _G
-end
+-- if minetest.request_insecure_environment then
+--    ie = minetest.request_insecure_environment()
+-- else
+--    ie = _G
+-- end
 --[[--------------------------------------------------------------------------
 
 The MIT License (MIT)
@@ -59,11 +59,15 @@ local Base64 = {}
 ----------------------------------------------------------------------------
 
 local bit
-local status,err = pcall(function() bit = ie.require 'bit' end)
-if not status then
-	bit = ie.dofile(minetest.get_modpath(minetest.get_current_modname()) .. '/slowbit32.lua')
+local band, bor, lshift, rshift = _G, _G, _G, _G
+
+function Base64.setup(ie)
+	local status,err = pcall(function() bit = ie.require 'bit' end)
+	if not status then
+		bit = ie.dofile(minetest.get_modpath(minetest.get_current_modname()) .. '/slowbit32.lua')
+	end
+	band, bor, lshift, rshift = bit.band, bit.bor, bit.lshift, bit.rshift
 end
-local band, bor, lshift, rshift = bit.band, bit.bor, bit.lshift, bit.rshift
 
 ----------------------------------------------------------------------------
 -- Constants and tables

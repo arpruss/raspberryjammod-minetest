@@ -1,22 +1,18 @@
-if minetest.request_insecure_environment then
-   ie = minetest.request_insecure_environment()
-else
-   ie = _G
-end
+-- if minetest.request_insecure_environment then
+--    ie = minetest.request_insecure_environment()
+-- else
+--    ie = _G
+-- end
 
 local bit
-local status,err = pcall(function() bit = ie.require 'bit' end)
-if not status then
-	bit = ie.dofile(minetest.get_modpath(minetest.get_current_modname()) .. '/slowbit32.lua')
-end
 
-local rol = bit.rol
-local bxor = bit.bxor
-local bor = bit.bor
-local band = bit.band
-local bnot = bit.bnot
-local lshift = bit.lshift
-local rshift = bit.rshift
+local rol = _G
+local bxor = _G
+local bor = _G
+local band = _G
+local bnot = _G
+local lshift = _G
+local rshift = _G
 local sunpack = string.unpack
 local srep = string.rep
 local schar = string.char
@@ -24,6 +20,22 @@ local tremove = table.remove
 local tinsert = table.insert
 local tconcat = table.concat
 local mrandom = math.random
+
+
+function setup(ie)
+   local status,err = pcall(function() bit = ie.require 'bit' end)
+   if not status then
+      bit = ie.dofile(minetest.get_modpath(minetest.get_current_modname()) .. '/slowbit32.lua')
+   end
+
+   rol = bit.rol
+   bxor = bit.bxor
+   bor = bit.bor
+   band = bit.band
+   bnot = bit.bnot
+   lshift = bit.lshift
+   rshift = bit.rshift
+end
 
 local read_n_bytes = function(str, pos, n)
   pos = pos or 1
@@ -211,4 +223,5 @@ return {
   write_int8 = write_int8,
   write_int16 = write_int16,
   write_int32 = write_int32,
+  setup = setup,
 }
