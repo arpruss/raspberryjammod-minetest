@@ -1,6 +1,12 @@
 import collections
 import math
 
+try:
+  basestring
+except NameError:
+  from builtins import str
+  basestring = str
+
 def flatten(l):
     for e in l:
         if isinstance(e, collections.Iterable) and not isinstance(e, basestring):

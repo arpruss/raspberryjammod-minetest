@@ -13,7 +13,7 @@ from time import sleep,time
 from random import randint
 import input
 import text
-from fonts import FONTS
+from lib.fonts import FONTS
 
 FONT = 'thin9pt' #metrix7pt
 HEIGHT = 20

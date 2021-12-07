@@ -17,7 +17,7 @@ import server
 try:
     mc = minecraft.Minecraft.create(server.address)
 except:
-    print "Cannot connect to Minecraft."
+    print("Cannot connect to Minetest.")
     sys.exit(0)
 
 # Create a function for picking a random direction.

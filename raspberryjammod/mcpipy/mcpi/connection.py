@@ -7,7 +7,7 @@ import os
 import platform
 import base64
 from hashlib import md5
-from util import flatten_parameters_to_string
+from .util import flatten_parameters_to_string
 
 """ @author: Aron Nieminen, Mojang AB"""
 
@@ -103,7 +103,7 @@ class Connection:
 
     def send_flat(self, f, data):
         """Sends data. Note that a trailing newline '\n' is added here"""
-#        print "f,data:",f,list(data)
+#        print("f,data:",f,list(data))
         s = "%s(%s)\n"%(f, ",".join(data))
         self.drain()
         self.lastSent = s
@@ -111,7 +111,7 @@ class Connection:
 
     def send_flat_python3(self, f, data):
         """Sends data. Note that a trailing newline '\n' is added here"""
-#        print "f,data:",f,list(data)
+#        print("f,data:",f,list(data))
         s = "%s(%s)\n"%(f, ",".join(data))
         self.drain()
         self.lastSent = s

@@ -47,7 +47,7 @@ i.e. `object1.stop()`
                             #object1=NeuroPy("/dev/rfcomm0") for linux
     def attention_callback(attention_value):
         "this function will be called everytime NeuroPy has a new value for attention"
-        print "Value of attention is",attention_value
+        print("Value of attention is",attention_value)
         #do other stuff (fire a rocket), based on the obtained value of attention_value
         #do some more stuff
         return None

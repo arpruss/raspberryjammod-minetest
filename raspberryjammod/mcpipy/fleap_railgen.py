@@ -6,15 +6,17 @@ import mcpi.minecraft as minecraft
 import mcpi.block as block
 #import time, so delays can be used
 import server
+import sys
 
 def main():
     mc = minecraft.Minecraft.create(server.address)
     # an abbrieviated flatmap
 #    mc.setBlocks(-50,-10,-50,50,10,50,block.AIR.id)
 #    mc.setBlocks(-50,0,-50,50,-10,50,block.SANDSTONE.id)
-    # The original flatmap
-    mc.setBlocks(-128,0,-128,128,64,128,0)
-    mc.setBlocks(-128,0,-128,128,-64,128,block.SANDSTONE.id)
+    if len(sys.argv) >= 2 and sys.argv[1] == 'FLAT':
+        # The original flatmap CUT AWAY your map around cube -128,-64,-128 - 128,64,128
+        mc.setBlocks(-128,0,-128,128,64,128,0)
+        mc.setBlocks(-128,0,-128,128,-64,128,block.SANDSTONE.id)
 
     #    exit()
     mc.postToChat("Hello you have successfully ran Rail Gen :).")

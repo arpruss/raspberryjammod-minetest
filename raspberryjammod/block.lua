@@ -188,6 +188,8 @@ block.LEAVES_DARK_OAK_DECAYABLE_CD=Block(block.LEAVES2, 9)
 block.LEAVES_ACACIA_PERMANENT_CD=Block(block.LEAVES2, 12)
 block.LEAVES_DARK_OAK_PERMANENT_CD=Block(block.LEAVES2, 13)
 
+block.OBSIDIAN_GLASS           =Block(1001)
+
 local to_node={}
 local from_node={}
 
@@ -411,6 +413,8 @@ translate(Block(block.STONE_SLAB,7),"stairs:slab_desert_stonebrick",0) -- FIX: n
 translate(Block(block.STONE_SLAB,14),"stairs:slab_desert_stonebrick",20)
 translate(Block(block.STONE_SLAB,8),"stairs:slab_desert_stone",0) -- FIX: quartz
 translate(Block(block.STONE_SLAB,15),"stairs:slab_desert_stone",20)
+
+translate(block.OBSIDIAN_GLASS,"default:obsidian_glass")
 
 local function defineTrapdoor(base_num,base_name)
    translate(Block(base_num,0),base_name,2)

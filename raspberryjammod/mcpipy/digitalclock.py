@@ -7,7 +7,7 @@ import text
 import datetime
 import time
 import sys
-import fonts
+from lib import fonts
 import ast
 
 foreground = SEA_LANTERN # this needs Minecraft 1.8
@@ -42,7 +42,7 @@ while True:
     if prevTime != curTime:
         for i in range(len(curTime)):
             if i >= len(prevTime) or prevTime[i] != curTime[i]:
-                text.drawText(mc, fonts.FONTS['8x8'], pos + forward * (8*i), forward, Vec3(0,1,0), curTime[i:], foreground, background)
+                text.drawText(mc, fonts.FONTS['8x8'], pos + forward * (8 * i), forward, Vec3(0, 1, 0), curTime[i:], foreground, background)
                 break
         prevTime = curTime
     time.sleep(0.1)

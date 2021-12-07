@@ -621,4 +621,4 @@ class NBTFile(TAG_Compound):
                     TAG_Compound.__name__, self.name, id(self))
 
 if __name__=="__main__":
-    print "NBT library"
+    print("NBT library")

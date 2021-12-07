@@ -1,11 +1,11 @@
-from connection import Connection,RequestError
-from vec3 import Vec3
-from event import BlockEvent,ChatEvent
-from block import Block
+from .connection import Connection,RequestError
+from .vec3 import Vec3
+from .event import BlockEvent,ChatEvent
+from .block import Block
 import math
 from os import environ
-from util import flatten,floorFlatten
-import security
+from .util import flatten,floorFlatten
+from . import security
 
 """ Minecraft PI low level api v0.1_1
 
@@ -373,4 +373,4 @@ class Minecraft:
 
 if __name__ == "__main__":
     mc = Minecraft.create()
-    mc.postToChat("Hello, Minecraft!")
+    mc.postToChat("Hello, Minetest!")

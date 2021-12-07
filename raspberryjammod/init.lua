@@ -107,6 +107,10 @@ if ws then
     ws_server:settimeout(0)
 end
 
+minetest.register_privilege("jammer", {
+    description = "Can launch Raspberry Jam Mod stuff",
+    give_to_singleplayer = false
+})
 
 minetest.register_globalstep(function(dtime)
     local newclient,err
@@ -190,7 +194,18 @@ minetest.register_on_shutdown(function()
     default_player_id = -1
 end)
 
+local function check_acl(name)
+    if minetest.check_player_privs(name, { jammer=true }) then
+        return true
+    end
+    minetest.chat_send_player(name, "Sorry, you need to be a jammer to launch an ingame python's script")
+    return false
+end
+
 minetest.register_on_joinplayer(function(player)
+    if not check_acl(player:get_player_name()) then
+    	return
+    end
     minetest.log("action", "Hello, player "..player:get_player_name())
     max_player_id = max_player_id + 1
     player_table[max_player_id] = player
@@ -202,10 +217,13 @@ minetest.register_on_leaveplayer(function(player)
     local id = get_player_id(player)
     if id then player_table[id] = nil end
     if id == default_player_id then
-        default_player_id = max_player_id
+        default_player_id = max_player_id + 1
         for i,p in pairs(player_table) do
           if p ~= nil and i < default_player_id then default_player_id = i end
         end
+	if default_player_id == (max_player_id + 1) then
+	  default_player_id = -1
+	end
     end
 end)
 
@@ -240,12 +258,12 @@ if minetest.emerge_area then
     		local size
     		if args ~= "" then
     		    size = tonumber(args)
-                    else
-                        size = 200
-                    end
-                    local p1 = {x = math.floor(pos.x - size/2), y = pos.y, z = math.floor(pos.z - size/2) }
-                    local p2 = {x = math.ceil(pos.x + size/2), y = pos.y + size, z = math.ceil(pos.z + size/2) }
-                    minetest.emerge_area(p1,p2)
+                else
+                    size = 200
+                end
+                local p1 = {x = math.floor(pos.x - size/2), y = pos.y, z = math.floor(pos.z - size/2) }
+                local p2 = {x = math.ceil(pos.x + size/2), y = pos.y + size, z = math.ceil(pos.z + size/2) }
+                minetest.emerge_area(p1,p2)
     	end})
 end
 
@@ -267,7 +285,10 @@ minetest.register_chatcommand("addpython",
 	func = function(name, args) python(name, args, false) end })
 
 function python(name, args, kill_script)
-	if (kill_script and script_running) then
+	if not check_acl(name) then
+		return false
+        end
+        if (kill_script and script_running) then
 	   kill(script_window_id)
 	   minetest.chat_send_all("Killed running scripts")
 	   script_running = false
@@ -329,6 +350,7 @@ function get_entity_id(entity)
 end
 
 function handle_entity(cmd, id, args)
+    minetest.log("action", cmd .. " on " .. (id and id or "?") .. " with " .. table.concat(args, ", "))
     local entity
     if id == nil then
         entity = player_table[default_player_id]
@@ -339,19 +361,19 @@ function handle_entity(cmd, id, args)
         return "fail"
     end
     if cmd == "getPos" then
-        local pos = entity:getpos()
+        local pos = entity:get_pos()
         return (pos.x+0.5)..","..(pos.y+0.5)..","..(0.5-pos.z)
     elseif cmd == "getTile" then
-        local pos = entity:getpos()
+        local pos = entity:get_pos()
         return math.floor(pos.x+0.5)..","..math.floor(pos.y+0.5)..","..math.floor(0.5-pos.z)
     elseif cmd == "setPos" then
-        entity:setpos({x=tonumber(args[1])-0.5, y=tonumber(args[2])-0.5, z=0.5-tonumber(args[3])})
+        entity:set_pos({x=tonumber(args[1])-0.5, y=tonumber(args[2])-0.5, z=0.5-tonumber(args[3])})
     elseif cmd == "setTile" then
-        entity:setpos({x=tonumber(args[1]), y=tonumber(args[2])-0.5, z=-tonumber(args[3])})
+        entity:set_pos({x=tonumber(args[1]), y=tonumber(args[2])-0.5, z=-tonumber(args[3])})
     elseif cmd == "getPitch" then
         return tonumber(entity:get_look_pitch() * -180 / math.pi)
     elseif cmd == "getRotation" then
-        return tonumber((270 - entity:get_look_yaw() * 180 / math.pi) % 360)
+        return tonumber((270 - entity:get_look_horizontal() * 180 / math.pi) % 360)
     elseif cmd == "getDirection" then
         local dir = entity:get_look_dir()
         return (dir.x)..","..(dir.y)..","..(-dir.z)
@@ -366,7 +388,7 @@ function handle_entity(cmd, id, args)
         -- values differ by pi/2. Ideally, the mod
         -- would detect this to make sure that if it's fixed in the next version
         -- this wouldn't be an issue.
-        entity:set_look_yaw((180-tonumber(args[1])) * math.pi / 180)
+        entity:set_look_horizontal((180-tonumber(args[1])) * math.pi / 180)
     elseif cmd == "setDirection" then
         -- TODO: Fix set_look_yaw() and get_look_yaw() compensation.
         local x = tonumber(args[1])
@@ -652,7 +674,6 @@ function background_launch(window_identifier, working_dir, cmd)
 end
 
 function kill(window_identifier)
-    -- TODO: non-Windows
     local cmd
     if is_windows then
     	cmd = 'taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"'

@@ -3,7 +3,6 @@
 #
 
 import sys
-import time
 import mcpi.minecraft as minecraft
 
 ALIGN_LEFT = 0
@@ -94,7 +93,7 @@ def angleToTextDirection(angle):
         return minecraft.Vec3(-1,0,1)
 
 if __name__ == '__main__':
-    import fonts
+    from lib import fonts
     import mcpi.block as block
 
     mc = minecraft.Minecraft()
@@ -109,4 +108,4 @@ if __name__ == '__main__':
         del sys.argv[0]
         text = " ".join(sys.argv)
 
-    drawText(mc, fonts.FONTS['metrix7pt'], pos, forward, minecraft.Vec3(0,1,0), text, foreground, background, align=ALIGN_RIGHT)
+    drawText(mc, fonts.FONTS['metrix7pt'], pos, forward, minecraft.Vec3(0, 1, 0), text, foreground, background, align=ALIGN_RIGHT)

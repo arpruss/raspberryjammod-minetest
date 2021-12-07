@@ -23,7 +23,7 @@ def replace(mcx,mcy,mcz,R,mcblock):
 mc = Minecraft()
 
 playerPos = mc.player.getPos()
-R = 20
+R = 5  # Avoid to hangup small servers
 b = TNT
 
 if len(sys.argv) >= 2:

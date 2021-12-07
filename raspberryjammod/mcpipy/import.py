@@ -97,13 +97,13 @@ def importSchematic(mc,path,x0,y0,z0,centerX=False,centerY=False,centerZ=False,c
                     if b==33 and (d&7)==7:
                         d = (d&8)
                     if (x,y,z) in tileEntityDict:
-#                        if b==33: \print x0+x,y0+y,z0+z,x,y,z,b,d,e
+#                        if b==33: \print(x0+x,y0+y,z0+z,x,y,z,b,d,e)
                         mc.setBlockWithNBT(x0+x,y0+y,z0+z,b,d,tileEntityDict[(x,y,z)])
                     else:
-#                        if b==33: print x0+x,y0+y,z0+z,x,y,z,b,d
+#                        if b==33: print(x0+x,y0+y,z0+z,x,y,z,b,d)
                         mc.setBlock(x0+x,y0+y,z0+z,b,d)
 
-    print "done"
+    print("done")
     # TODO: entities
     return corner1,corner2
 
@@ -111,8 +111,8 @@ if __name__=='__main__':
     if len(argv) >= 2:
         path = argv[1]
     else:
-        import Tkinter
-        from tkFileDialog import askopenfilename
+        import tkinter as Tkinter
+        from tkinter.filedialog import askopenfilename
         master = Tkinter.Tk()
         master.attributes("-topmost", True)
         path = askopenfilename(filetypes=['schematic {*.schematic}'],title="Open")

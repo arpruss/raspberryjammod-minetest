@@ -560,11 +560,11 @@ def genFacesVertex(points,x0,y0,z0,size):
             #xi1 = matrix[0][0] * xi + matrix[0][1] * yi + matrix[0][2] * zi
             #yi1 = matrix[1][0] * xi + matrix[1][1] * yi + matrix[1][2] * zi
             #zi1 = matrix[2][0] * xi + matrix[2][1] * yi + matrix[2][2] * zi
-            #print (100000 + xi1) - 100000, yi1, zi1
+            #print( (100000 + xi1) - 100000, yi1, zi1)
             #xj1 = matrix[0][0] * xj + matrix[0][1] * yj + matrix[0][2] * zj
             #yj1 = matrix[1][0] * xj + matrix[1][1] * yj + matrix[1][2] * zj
             #zj1 = matrix[2][0] * xj + matrix[2][1] * yj + matrix[2][2] * zj
-            #print (100000 + xj1) - 100000, yj1, zj1
+            #print( (100000 + xj1) - 100000, yj1, zj1)
             #
             # And this computes the product of the matrix and its
             # transpose, which should come to the identity matrix since
@@ -579,7 +579,7 @@ def genFacesVertex(points,x0,y0,z0,size):
             #           s = s + matrix[y][k] * matrix[x][k]
             #       mrow.append((10000000 + s) - 10000000)
             #    testmatrix.append(mrow)
-            #print testmatrix
+            #print(testmatrix)
 
             # Whew. So after that moderately hairy piece of linear
             # algebra, we can now transform our point set so that when
@@ -719,18 +719,18 @@ def genFacesVertex(points,x0,y0,z0,size):
 
 
 def polyhedron(d,n,faceMode,x,y,z,size,faceBlock,edgeBlock=None):
-    print "Generating points"
+    print("Generating points")
     points = makePoints(n)
     if faceMode:
-        print "Generating faces with face construction"
+        print("Generating faces with face construction")
         faces = genFacesFace(points,x,y,z,size/2)
     else:
-        print "Generating faces with vertex construction"
+        print("Generating faces with vertex construction")
         faces = genFacesVertex(points,x,y,z,size/2)
-    print "Drawing faces"
+    print("Drawing faces")
     for face in faces:
         d.face(face,faceBlock)
-    print "Drawing edges"
+    print("Drawing edges")
     if edgeBlock:
         for face in faces:
             prev = face[-1]

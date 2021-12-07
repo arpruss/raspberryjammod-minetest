@@ -23,5 +23,5 @@ mc = minecraft.Minecraft.create(server.address)
 playerPos = mc.player.getPos()
 
 draw_spiral(playerPos.x, playerPos.y, playerPos.z, 18, 10, 200, 30, 0, block.GOLD_BLOCK, 0)
-draw_spiral(playerPos.x, playerPos.y, playerPos.z, 18, 10, 200, 30, math.pi, block.GOLD_BLOCK, 0)
+draw_spiral(playerPos.x, playerPos.y, playerPos.z, 18, 10, 200, 30, math.pi, block.DIAMOND_BLOCK, 0)
 mc.postToChat("Spiral done")                                                                              

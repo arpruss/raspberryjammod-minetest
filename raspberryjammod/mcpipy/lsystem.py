@@ -9,6 +9,12 @@ import random
 import mcpi.settings
 from mcturtle import *
 
+try:
+    basestring
+except:
+    basestring = str
+
+
 def playProgram(s, dictionary):
     for c in s:
         if c in dictionary:

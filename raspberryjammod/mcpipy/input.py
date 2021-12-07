@@ -133,6 +133,165 @@ if system() == 'Windows':
     def clearPressBuffer(key):
         while wasPressedSinceLast(key):
             pass
+elif system() == 'Linux':
+    from pynput.keyboard import Key, Listener as KListener
+    from pynput.mouse import Button, Listener as MListener
+
+    LBUTTON = Button.left
+    RBUTTON = Button.right
+    CANCEL = Key.delete
+    MBUTTON = Button.middle
+    BACK = Key.backspace
+    TAB = Key.tab
+    CLEAR = Key.delete
+    RETURN = Key.enter
+    SHIFT = Key.shift
+    CONTROL = Key.ctrl
+    MENU = Key.menu
+    PAUSE = Key.media_play_pause
+    CAPITAL = Key.caps_lock
+    KANA = 21
+    HANGUL = 21
+    JUNJA = 23
+    FINAL = 24
+    HANJA = 25
+    KANJI = 25
+    ESCAPE = Key.esc
+    CONVERT = 28
+    NONCONVERT = 29
+    ACCEPT = 30
+    MODECHANGE = 31
+    SPACE = Key.space
+    PRIOR = 33
+    NEXT = 34
+    END = Key.end
+    HOME = Key.home
+    LEFT = Key.left
+    UP = Key.up
+    RIGHT = Key.right
+    DOWN = Key.down
+    SELECT = 41
+    PRINT = Key.print_screen
+    EXECUTE = 43
+    SNAPSHOT = 44
+    INSERT = Key.insert
+    DELETE = Key.delete
+    HELP = 47
+    LWIN = Key.cmd
+    RWIN = Key.cmd_r
+    APPS = 93
+    NUMPAD0 = 96
+    NUMPAD1 = 97
+    NUMPAD2 = 98
+    NUMPAD3 = 99
+    NUMPAD4 = 100
+    NUMPAD5 = 101
+    NUMPAD6 = 102
+    NUMPAD7 = 103
+    NUMPAD8 = 104
+    NUMPAD9 = 105
+    MULTIPLY = 106
+    ADD = 107
+    SEPARATOR = 108
+    SUBTRACT = 109
+    DECIMAL = 110
+    DIVIDE = 111
+    F1 = Key.f1
+    F2 = Key.f2
+    F3 = Key.f3
+    F4 = Key.f4
+    F5 = Key.f5
+    F6 = Key.f6
+    F7 = Key.f7
+    F8 = Key.f8
+    F9 = Key.f9
+    F10 = Key.f10
+    F11 = Key.f11
+    F12 = Key.f12
+    F13 = Key.f13
+    F14 = Key.f14
+    F15 = Key.f15
+    F16 = Key.f16
+    F17 = Key.f17
+    F18 = Key.f18
+    F19 = Key.f19
+    F20 = Key.f20
+    F21 = 132
+    F22 = 133
+    F23 = 134
+    F24 = 135
+    NUMLOCK = Key.num_lock
+    SCROLL = Key.scroll_lock
+    LSHIFT = Key.shift
+    RSHIFT = Key.shift_r
+    LCONTROL = Key.ctrl
+    RCONTROL = Key.ctrl_r
+    LMENU = Key.menu
+    RMENU = Key.menu
+    PROCESSKEY = 229
+    ATTN = 246
+    CRSEL = 247
+    EXSEL = 248
+    EREOF = 249
+    PLAY = Key.media_play_pause
+    ZOOM = 251
+    NONAME = 252
+    PA1 = 253
+    OEM_CLEAR = 254
+    XBUTTON1 = 0x05
+    XBUTTON2 = 0x06
+    VOLUME_MUTE = Key.media_volume_mute
+    VOLUME_DOWN = Key.media_volume_down
+    VOLUME_UP = Key.media_volume_up
+    MEDIA_NEXT_TRACK = Key.media_next
+    MEDIA_PREV_TRACK = Key.media_previous
+    MEDIA_PLAY_PAUSE = Key.media_play_pause
+    BROWSER_BACK = 0xA6
+    BROWSER_FORWARD = 0xA7
+
+
+    class KeyStatus:
+        pressed = []
+        released = False
+
+    def convertKey(key):
+        if type(key) != int:
+            return key
+        elif key == 27:
+            return ESCAPE
+        elif key == 32:
+            return SPACE
+        else:
+            return chr(key)
+
+
+    def getPressState(key):
+        k = convertKey(key)
+        return isPressedNow(k), wasPressedSinceLast(k)
+
+    def isPressedNow(key):
+        return convertKey(key) in KeyStatus.pressed
+
+    def wasPressedSinceLast(key):
+        if KeyStatus.released == convertKey(key):
+            KeyStatus.released = False
+            return True
+        return False
+
+    def clearPressBuffer(key):
+        while wasPressedSinceLast(convertKey(key)):
+            pass
+
+    def key_down(key):
+        KeyStatus.pressed.append(key)
+
+    def key_up(key):
+        KeyStatus.released = key
+        if key in KeyStatus.pressed:
+            KeyStatus.pressed.remove(key)
+
+    listener = KListener(on_press=key_down, on_release=key_up)
+    listener.start()
 else:
     raise Exception('Platform '+system()+' not supported.')
             
@@ -145,6 +304,5 @@ if __name__ == '__main__':
             break
         now,last = getPressState(ord(' '))
         if now or last:
-            print now, last
+            print(now, last)
         sleep(0.01)
-        

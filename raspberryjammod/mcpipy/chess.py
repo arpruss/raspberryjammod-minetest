@@ -8,15 +8,15 @@
 #
 
 from collections import OrderedDict
-from mc import *
 from vehicle import *
 from text import *
-from fonts import *
+from lib.fonts import *
 import drawing
 import time
 import sys
 
 LABEL_BLOCK = REDSTONE_BLOCK
+SECS = 3
 
 try:
     import _sunfish as sunfish
@@ -39,19 +39,19 @@ except:
         print("Error creating _sunfish.py")
         sys.exit(0)
             
-def getCoords(row,col):
-    return (corner.x+8*row+4,corner.y,corner.z+8*col+4)
+def getCoords(row, col):
+    return (corner.x+8*row+4, corner.y, corner.z+8*col+4)
 
 def toRowCol(n, black):
-    row = 7 - ((n - 20) / 10)
+    row = math.ceil(7 - ((n - 20) / 10))
     col = n % 10 - 1
     if black:
         col = 7 - col
         row = 7 - row
-    return row,col
+    return row, col
 
 def toRowColMove(m, black):
-    return toRowCol(m[0],black),toRowCol(m[1],black)
+    return toRowCol(m[0], black), toRowCol(m[1], black)
 
 def toNumeric(rowCol,black):
     if black:
@@ -260,6 +260,7 @@ def getPiece(row,col):
     except KeyError:
         return None
 
+
 def inputMove():
     moves = []
     mc.events.clearAll()
@@ -275,9 +276,9 @@ def inputMove():
         hits = mc.events.pollBlockHits()
         if len(hits) > 0:
             c = hits[0].pos
-            if ( corner.x <= c.x and corner.y -1 <= c.y and corner.z <= c.z and
-                 c.x < corner.x + 64 and c.y < corner.y + MAXHEIGHT and c.z < corner.z + 64 ):
-                m = (c.x - corner.x) / 8, (c.z - corner.z) /8
+            if (corner.x <= c.x and corner.y -1 <= c.y and corner.z <= c.z and
+                 c.x < corner.x + 64 and c.y < corner.y + MAXHEIGHT and c.z < corner.z + 64):
+                m = int((c.x - corner.x) / 8), int((c.z - corner.z) / 8)
                 if len(moves) == 0 or m[0] != moves[0][0] or m[1] != moves[0][1]:
                     highlightSquare(m[0],m[1])
                     moves.append(m)
@@ -285,14 +286,14 @@ def inputMove():
                     mc.events.clearAll() # debounce
                     continue
             for m in moves:
-                drawSquare(m[0],m[1])
+                drawSquare(m[0], m[1])
             moves = []
             mc.postToChat('Canceled. Enter another move.')
             time.sleep(0.2)
             mc.events.clearAll() # debounce
         time.sleep(0.2)
     for m in moves:
-        drawSquare(m[0],m[1])
+        drawSquare(m[0], m[1])
     return tuple(moves)
 
 def animateMove(rowColMove):
@@ -363,6 +364,14 @@ def myGetBlockWithData(pos):
             return pieces[boardPos].curVehicle[pos]
     return AIR
 
+
+def nextMove(searcher, pos):
+    start = time.time()
+    for depth, move, score in searcher.search(pos):
+        if time.time() - start > SECS:
+            break
+    return move, score, depth
+
 # z coordinate is cols
 # x coordinate is rows
 pieces = {}
@@ -384,7 +393,7 @@ for row in range(8):
         v.blankBehind()
 
 playerMovesNext = not black
-
+searcher = sunfish.Searcher()
 while True:
     if playerMovesNext:
         if black:
@@ -393,7 +402,7 @@ while True:
             mc.postToChat("White to move.")
         if demo:
             sunfish.tp = OrderedDict()
-            move,score = sunfish.search(pos)
+            move, score, _ = nextMove(searcher, pos)
         else:
             moves = tuple(pos.gen_moves())
             move = None
@@ -401,21 +410,21 @@ while True:
                 if move is not None:
                     mc.postToChat("Illegal move.")
                 mc.postToChat("Right-click the start and end points with a sword.")
-                move = toNumericMove(inputMove(),black)
-        rowColMove = toRowColMove(move,black)
+                move = toNumericMove(inputMove(), black)
+        rowColMove = toRowColMove(move, black)
         mc.postToChat("Player: "+ toAlgebraicMove(rowColMove))
         animateMove(rowColMove)
         pos = pos.move(move)
     mc.postToChat("Thinking...")
     if demo: sunfish.tp = OrderedDict()
-    move,score = sunfish.search(pos)
-    if score <= -sunfish.MATE_VALUE:
+    move, score, _ = nextMove(searcher, pos)
+    if score <= -sunfish.MATE_LOWER:
         mc.postToChat("I resign. You won the game.")
         break
     rowColMove = toRowColMove(move,not black)
     mc.postToChat("Computer: "+toAlgebraicMove(rowColMove))
     animateMove(rowColMove)
-    if sunfish.MATE_VALUE <= score:
+    if sunfish.MATE_UPPER <= score:
         mc.postToChat("You lost the game.")
         break
     pos = pos.move(move)

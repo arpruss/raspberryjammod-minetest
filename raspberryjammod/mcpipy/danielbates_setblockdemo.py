@@ -33,7 +33,7 @@ Transformations can be combined by multiplying them together."""
     elif isinstance(other, coordinate3d):
       return self.apply(other)
     else:
-      print "Can't multiply transformation by {0}".format(type(other))
+      print("Can't multiply transformation by {0}".format(type(other)))
 
   def compose(self, other):
     """Compose this transformation with another, returning a new transformation."""
