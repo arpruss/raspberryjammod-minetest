@@ -25,10 +25,10 @@ while True:
     pos = mc.entity.getPos(entity)
     yaw = mc.entity.getRotation(entity)
     move = False
-    if input.wasPressedSinceLast(input.NEXT):
+    if input.wasPressedSinceLast(input.PAGE_DOWN):
         pos.y -= 1
         move = True
-    if input.wasPressedSinceLast(input.PRIOR):
+    if input.wasPressedSinceLast(input.PAGE_UP):
         pos.y += 1
         move = True
     if input.wasPressedSinceLast(input.LEFT):
@@ -45,6 +45,8 @@ while True:
         pos.x -= .5 * -sin(radians(yaw))
         pos.z -= .5 * cos(radians(yaw))
         move = True
+    if input.wasPressedSinceLast(input.ESCAPE):
+        break
     if move:
         if player:
             under = (int(floor(pos.x)),int(floor(pos.y))-1,int(floor(pos.z)))
@@ -64,4 +66,4 @@ while True:
         else:
             mc.entity.setPos(entity,pos)
     sleep(0.2)
-    
+mc.postToChat("Bye bye, puppet")

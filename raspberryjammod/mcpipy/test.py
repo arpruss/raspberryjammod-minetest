@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import mcpi.minecraft as minecraft
-import mcpi.block as block
-import server
-import math
+from lib import server
 
 mc = minecraft.Minecraft.create(server.address)
 mc.player.setPos(0,3,4)

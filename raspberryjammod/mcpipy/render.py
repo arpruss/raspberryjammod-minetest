@@ -26,7 +26,8 @@ SOFTWARE.
 
 from zipfile import ZipFile
 import sys
-import urllib2
+import urllib
+import requests
 import struct
 from collections import OrderedDict
 import mcpi.minecraft as minecraft
@@ -627,7 +628,7 @@ class Mesh(object):
                     outName = self.archive
                 else:
                     outName = self.meshName
-            content = urllib2.urlopen(url).read()
+            content = urllib.request.urlopen(url).read()
             with open(outName + ".tempDownload","wb") as f:
                 f.write(content)
             os.rename(outName + ".tempDownload", outName)
@@ -678,10 +679,11 @@ class Mesh(object):
             self.materialOrders = [0]
             materialIndexDict = { Mesh.UNSPECIFIED: 0 }
 
-            with myopen(name) as fh:
-                for line in fh :
-                    line = line.strip()
-                    if len(line) == 0 or line[0] == '#' : continue
+            with myopen(name, mode="r") as fh:
+                for line in fh:
+                    line = line.strip() if type(line) == str else line.strip().decode()
+                    if len(line) == 0 or line[0] == '#':
+                        continue
                     line = re.split('\s+', line)
                     if line[0] == 'v' :
                         self.baseVertices.append(applyMatrix(matrix,V3(fix([float(x) for x in line[1:]]))))
@@ -746,6 +748,9 @@ class Mesh(object):
         maximum = [None, None, None]
 
         self.vertices = []
+
+        #if len(self.baseVertices) < 1:
+        #    return
 
         for v in self.baseVertices:
             vertex = applyMatrix(matrix,v)
@@ -837,11 +842,13 @@ def go(filename, args=[]):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         if settings.isPE:
-            go("models/RaspberryPi.txt")
+            go(os.path.dirname(os.path.realpath(sys.argv[0])) + "/models/RaspberryPi.txt")
         else:
-            from tkFileDialog import askopenfilename
-            from Tkinter import *
-            master = Tk()
+            import tkinter
+            from tkinter import *
+            from tkinter.filedialog import askopenfilename
+
+            master = tkinter.Tk()
             master.wm_title("render")
             master.attributes("-topmost", True)
             Label(master, text='Size').grid(row=0)
@@ -885,4 +892,4 @@ if __name__ == "__main__":
 
             mainloop()
     else:
-        go(os.path.dirname(os.path.realpath(sys.argv[0])) + "/" + "models/" + sys.argv[1] + ".txt", sys.argv[2:])
+        go(os.path.dirname(os.path.realpath(sys.argv[0])) + "/models/" + sys.argv[1] + ".txt", sys.argv[2:])

@@ -7,7 +7,7 @@
 import mcpi.minecraft as minecraft
 import mcpi.block as block
 from math import *
-import server
+from lib import server
 
 colors = [14, 1, 4, 5, 3, 11, 10]
 

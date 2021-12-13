@@ -133,8 +133,9 @@ if system() == 'Windows':
     def clearPressBuffer(key):
         while wasPressedSinceLast(key):
             pass
+
 elif system() == 'Linux':
-    from pynput.keyboard import Key, Listener as KListener
+    from pynput.keyboard import Key, KeyCode, Listener as KListener
     from pynput.mouse import Button, Listener as MListener
 
     LBUTTON = Button.left
@@ -161,7 +162,7 @@ elif system() == 'Linux':
     NONCONVERT = 29
     ACCEPT = 30
     MODECHANGE = 31
-    SPACE = Key.space
+    SPACE = 32
     PRIOR = 33
     NEXT = 34
     END = Key.end
@@ -249,46 +250,60 @@ elif system() == 'Linux':
     BROWSER_BACK = 0xA6
     BROWSER_FORWARD = 0xA7
 
+    PAGE_DOWN = Key.page_down
+    PAGE_UP = Key.page_up
+
 
     class KeyStatus:
         pressed = []
-        released = False
+        released = []
 
     def convertKey(key):
-        if type(key) != int:
+        if type(key) == Key:
+            return key if key.value.char is None else key.value
+        elif type(key) != int:
             return key
-        elif key == 27:
-            return ESCAPE
-        elif key == 32:
-            return SPACE
-        else:
-            return chr(key)
-
+        return KeyCode(char=chr(key))
 
     def getPressState(key):
-        k = convertKey(key)
-        return isPressedNow(k), wasPressedSinceLast(k)
+        return isPressedNow(key), wasPressedSinceLast(key)
 
     def isPressedNow(key):
-        return convertKey(key) in KeyStatus.pressed
+        k = convertKey(key)
+        if k in KeyStatus.pressed:
+            KeyStatus.pressed.remove(k)
+            return True
+        return False
 
     def wasPressedSinceLast(key):
-        if KeyStatus.released == convertKey(key):
-            KeyStatus.released = False
+        k = convertKey(key)
+        if k in KeyStatus.released:
+            KeyStatus.released.remove(k)
             return True
         return False
 
     def clearPressBuffer(key):
-        while wasPressedSinceLast(convertKey(key)):
+        while wasPressedSinceLast(key):
             pass
 
+    def matchable_key(key):
+        if type(key) == Key:
+            return key if key.value.char is None else key.value
+        if type(key) == KeyCode:
+            return key
+        if type(key) != int:
+            return key
+        return KeyCode(char=key if type(key) == int else chr(key))
+
     def key_down(key):
-        KeyStatus.pressed.append(key)
+        k = matchable_key(key)
+        if len(KeyStatus.pressed) > 0 and KeyStatus.pressed[len(KeyStatus.pressed) - 1] == k:
+            return
+        KeyStatus.pressed.append(k)
 
     def key_up(key):
-        KeyStatus.released = key
-        if key in KeyStatus.pressed:
-            KeyStatus.pressed.remove(key)
+        k = matchable_key(key)
+        KeyStatus.released.append(k)
 
     listener = KListener(on_press=key_down, on_release=key_up)
     listener.start()
@@ -297,12 +312,14 @@ else:
             
 if __name__ == '__main__':
     from time import sleep
-    print("Press ESC to exit. Testing spacebar.")
+    print("Press ESC to exit. Testing spacebar and backspace.")
     while True:
         if wasPressedSinceLast(ESCAPE):
             print("Done")
             break
-        now,last = getPressState(ord(' '))
+        if isPressedNow(BACK):
+            print("BACKSPACE is pressed")
+        now, last = getPressState(ord(' '))
         if now or last:
             print(now, last)
         sleep(0.01)

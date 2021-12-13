@@ -1,6 +1,6 @@
 import mcpi.minecraft as minecraft
 from mcpi.block import *
-import server
+from lib import server
 from ast import literal_eval
 
 

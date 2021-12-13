@@ -21,7 +21,8 @@ import mcpi.block as block
 import time
 import random
 import math
-import server
+from lib import server
+
 
 def new_direction(old_direction):
     max_direction = 5

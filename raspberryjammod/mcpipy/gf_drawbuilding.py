@@ -1,7 +1,7 @@
 #! /usr/bin/python
 import mcpi.minecraft as minecraft
 import mcpi.block as block
-import server
+from lib import server
 import random
 
 """ draw a building
@@ -40,5 +40,5 @@ def drawBuilding( locx, locy, locz, floors, width, depth, floorheight, wallmater
     #mc.setBlocks( topx-1, locy+1, topz-1, topx-1, topy-1, topz-1, block.LADDER )
                 
 if __name__ == "__main__":
-    mc = minecraft.Minecraft.create( server.address )
+    mc = minecraft.Minecraft.create(server.address)
     drawBuilding( 0, 0, 0, 5, 5, 5, 3, block.STONE, block.WOOD_PLANKS )

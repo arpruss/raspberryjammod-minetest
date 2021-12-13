@@ -12,7 +12,7 @@ import mcpi.minecraft as minecraft
 import mcpi.block as block
 #import time, so delays can be used
 import time
-import server
+from lib import server
 
 
 #function to round players float position to integer position

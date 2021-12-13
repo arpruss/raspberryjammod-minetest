@@ -23,7 +23,7 @@ import mcpi.block as block
 import time
 #import random module to create random number
 import random
-import server
+from lib import server
 
 
 #snake class which controls the whole game

@@ -3,10 +3,9 @@
 #import the minecraft.py module from the minecraft directory
 import mcpi.minecraft as minecraft
 #import minecraft block module
-import mcpi.block as block
 #import time, so delays can be used
 import time
-import server
+from lib import server
 
 if __name__ == "__main__":
     mc = minecraft.Minecraft.create(server.address)

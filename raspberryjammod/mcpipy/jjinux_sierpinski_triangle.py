@@ -13,7 +13,7 @@ import random
 
 import mcpi.minecraft
 import mcpi.block as block
-import server
+from lib import server
 
 # It goes from -MAX_XZ to MAX_XZ.
 MAX_XZ = 128

@@ -10,8 +10,7 @@ import mcpi.minecraft as minecraft
 import mcpi.block as block
 import sys, random
 from random import randint as rand
-import server
-
+from lib import server
 
 # Connect to Minecraft.
 try:

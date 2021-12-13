@@ -169,4 +169,4 @@ if __name__ == "__main__":
         for h in hits:
             v = tuple(x for x in h.pos)
             copy(v,airOnly=True)
-            copy(addVec(v,faces[h.face]))
+            copy(addVec(v, faces[h.face -1]))

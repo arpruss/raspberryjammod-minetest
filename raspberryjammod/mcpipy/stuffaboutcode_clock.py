@@ -16,7 +16,7 @@ import time
 import datetime
 #import math so we can use cos and sin
 import math
-import server
+from lib import server
 
 
 #mid point circle algorithm

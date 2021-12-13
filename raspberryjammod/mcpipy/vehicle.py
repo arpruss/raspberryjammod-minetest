@@ -454,6 +454,67 @@ if __name__ == '__main__':
         minecraft.postToChat("Found "+str(len(dict))+" blocks")
         vehicle.setVehicle(dict, startRot)
 
+    def chat_commands(chats, entity=None):
+        for post in chats:
+            args = post.message.split()
+            if len(args) > 0:
+                if args[0] == 'vhelp':
+                    chatHelp()
+                elif args[0] == 'verase':
+                    vehicle.erase()
+                    return False
+                elif args[0] == 'vpark':
+                    return False
+                elif args[0] == 'vsave':
+                    if len(args) > 1:
+                        save(args[1])
+                    else:
+                        save(None)
+                        # chatHelp()
+                elif args[0] == 'vlist':
+                    try:
+                        out = None
+                        dir = os.path.join(os.path.dirname(sys.argv[0]), "vehicles")
+                        for f in os.listdir(dir):
+                            if f.endswith(".py"):
+                                if out is not None:
+                                    out += ' ' + f[:-3]
+                                else:
+                                    out = f[:-3]
+                        if out is None:
+                            minecraft.postToChat('No saved vehicles')
+                        else:
+                            minecraft.postToChat(out)
+                    except:
+                        minecraft.postToChat('Error listing (maybe no directory?)')
+                elif args[0] == 'vload':
+                    try:
+                        save("_backup")
+                        minecraft.postToChat('Old vehicle saved as "_backup".')
+                        load(args[1] if len(args) >= 2 else None)
+                    except:
+                        minecraft.postToChat("Error loading")
+                elif args[0] == 'vdriver':
+                    if entity is not None:
+                        minecraft.removeEntity(entity)
+                        entity = None
+                    else:
+                        direction = minecraft.player.getDirection() * 10
+                        direction.y = 0
+                        minecraft.player.setPos(pos + direction)
+                    if len(args) > 1:
+                        try:
+                            entity = minecraft.spawnEntity(args[1], pos.x, pos.y, pos.z,
+                                                           '{CustomName:"' + args[1] + '"}')
+                            getRotation = lambda: minecraft.entity.getRotation(entity)
+                            getTilePos = lambda: minecraft.entity.getTilePos(entity)
+                        except:
+                            minecraft.postToChat('Error spawning ' + args[1])
+                    else:
+                        getRotation = minecraft.player.getRotation
+                        getTilePos = minecraft.player.getTilePos
+        return entity
+
     bubble = False
     nondestructive = False
     flash = True
@@ -534,61 +595,9 @@ if __name__ == '__main__':
         vehicle.moveTo(pos.x,pos.y,pos.z,getRotation())
         try:
             chats = minecraft.events.pollChatPosts()
-            for post in chats:
-                args = post.message.split()
-                if len(args)>0:
-                    if args[0] == 'vhelp':
-                        chatHelp()
-                    elif args[0] == 'verase':
-                        vehicle.erase()
-                        exit()
-                    elif args[0] == 'vsave':
-                        if len(args) > 1:
-                            save(args[1])
-                        else:
-                            save(None)
-                            #chatHelp()
-                    elif args[0] == 'vlist':
-                        try:
-                             out = None
-                             dir = os.path.join(os.path.dirname(sys.argv[0]),"vehicles")
-                             for f in os.listdir(dir):
-                                 if f.endswith(".py"):
-                                     if out is not None:
-                                         out += ' '+f[:-3]
-                                     else:
-                                         out = f[:-3]
-                             if out is None:
-                                 minecraft.postToChat('No saved vehicles')
-                             else:
-                                 minecraft.postToChat(out)
-                        except:
-                             minecraft.postToChat('Error listing (maybe no directory?)')
-                    elif args[0] == 'vload':
-                        try:
-                            save("_backup")
-                            minecraft.postToChat('Old vehicle saved as "_backup".')
-                            load(args[1] if len(args)>=2 else None)
-                        except:
-                            minecraft.postToChat("Error loading")
-                    elif args[0] == 'vdriver':
-                        if entity != None:
-                            minecraft.removeEntity(entity)
-                            entity = None
-                        else:
-                            direction = minecraft.player.getDirection()*10
-                            direction.y = 0
-                            minecraft.player.setPos(pos + direction)
-                        if len(args) > 1:
-                            try:
-                                entity = minecraft.spawnEntity(args[1],pos.x,pos.y,pos.z,'{CustomName:"'+args[1]+'"}')
-                                getRotation = lambda: minecraft.entity.getRotation(entity)
-                                getTilePos = lambda: minecraft.entity.getTilePos(entity)
-                            except:
-                                minecraft.postToChat('Error spawning '+args[1])
-                        else:
-                            getRotation = minecraft.player.getRotation
-                            getTilePos = minecraft.player.getTilePos
+            entity = chat_commands(chats, entity=entity)
+            if entity is False:
+                break
         except RequestError:
             pass
         time.sleep(0.25)

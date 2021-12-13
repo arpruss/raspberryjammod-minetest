@@ -16,7 +16,7 @@ import time
 import random
 #import math module to use square root function
 import math
-import server
+from lib import server
 
 
 #function to round players float position to integer position

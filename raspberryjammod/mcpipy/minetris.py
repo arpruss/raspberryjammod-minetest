@@ -23,12 +23,53 @@ BACKGROUND = STAINED_GLASS_BLACK
 
 DELAYS = ( 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05)
 
-PIECES = (  (('XXXX',), ('.X','.X','.X','.X')),
-            (('XX','XX'),),
-            (('XXX', '..X'), ('.X', '.X', 'XX'), ('X','XXX'), ('XX', 'X', 'X')),
-            (('XXX', 'X'), ('XX', '.X', '.X'), ('..X', 'XXX'), ('X.', 'X.', 'XX')),
-            (('XX', '.XX'), ('.X','XX', 'X.')),
-            (('.XX', 'XX'), ('X.', 'XX', '.X')) )
+PIECES = (  (('XXXX',),
+             ('.X',
+              '.X',
+              '.X',
+              '.X')),
+            (('XX',
+              'XX'),),
+            (('XXX',
+              '..X'),
+             ('.X',
+              '.X',
+              'XX'),
+             ('X',
+              'XXX'),
+             ('XX',
+              'X',
+              'X')),
+            (('XXX',
+              'X'),
+             ('XX',
+              '.X',
+              '.X'),
+             ('..X',
+              'XXX'),
+             ('X.',
+              'X.',
+              'XX')),
+            (('XX',
+              '.XX'),
+             ('.X',
+              'XX',
+              'X.')),
+            (('.XX',
+              'XX'),
+             ('X.',
+              'XX',
+              '.X')),
+            (('XXX',
+              '.X'),
+             ('.X',
+              'XX',
+              '.X'),
+             ('.X',
+              'XXX'),
+             ('X.',
+              'XX',
+              'X.')) )
 
 def inputMoveDown():
     return input.wasPressedSinceLast(input.DOWN)
@@ -40,34 +81,34 @@ def inputMoveRight():
     return input.wasPressedSinceLast(input.RIGHT)
 
 def inputRotateLeft():
-    return input.wasPressedSinceLast(input.PRIOR)
+    return input.wasPressedSinceLast(input.UP)
     
 def inputRotateRight():
     return input.wasPressedSinceLast(input.NEXT)
                 
 def inputNext():
-    return input.wasPressedSinceLast(ord('N'))
+    return input.wasPressedSinceLast(ord('n'))
     
 def inputLevelUp():
-    return input.wasPressedSinceLast(ord('L'))
+    return input.wasPressedSinceLast(ord('l'))
     
 def inputPause():
-    return input.wasPressedSinceLast(ord('P'))
+    return input.wasPressedSinceLast(ord('p'))
     
 def answerYes():
-    input.clearPressBuffer(ord('Y'))
-    input.clearPressBuffer(ord('N'))
+    input.clearPressBuffer(ord('y'))
+    input.clearPressBuffer(ord('n'))
     while True:
-        if input.wasPressedSinceLast(ord('Y')):
+        if input.wasPressedSinceLast(ord('y')):
             return True
-        if input.wasPressedSinceLast(ord('N')):
+        if input.wasPressedSinceLast(ord('n')):
             return False
         sleep(0.1)
 
 def clearInput():
     for k in (input.DOWN, input.LEFT, input.RIGHT,
                 input.PRIOR, input.NEXT, input.UP,
-                ord('N'), ord('L'), ord('P'), ord('Y')):
+                ord('n'), ord('l'), ord('p'), ord('y')):
         input.clearPressBuffer(k)
     
 def drawBoard():

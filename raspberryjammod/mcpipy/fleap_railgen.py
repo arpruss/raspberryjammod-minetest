@@ -5,7 +5,7 @@ import mcpi.minecraft as minecraft
 #import minecraft block module
 import mcpi.block as block
 #import time, so delays can be used
-import server
+from lib import server
 import sys
 
 def main():

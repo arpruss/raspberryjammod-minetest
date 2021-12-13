@@ -2,7 +2,7 @@
 
 import mcpi.minecraft as minecraft
 import mcpi.block as block
-import server
+from lib import server
 import math
 
 def draw_horizontal_disc(cx, cy, cz, radius, block_type, meta):

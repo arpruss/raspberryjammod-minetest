@@ -20,3 +20,10 @@ address = "127.0.0.1"
 
 is_pi = False
 #is_pi = False
+
+# If you are developing/testing on Minetest, instead of Minecraft.
+# By setting the flag below to true or false, a script can use conditional logic on which environment to use.
+# this flag is introduced on the Minetest libraries, so the default is not set at all, if you are running Minecraft.
+# But these are the Minetest libraries so...
+
+is_mt = True

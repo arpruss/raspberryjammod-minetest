@@ -31,7 +31,7 @@ else
 end
 
 local block = ie.require("block")
-local socket = ie.require("socket")
+local socket = ie.dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/socket.lua")
 socket.setup(ie)
 
 local block_hits = {}
@@ -329,7 +329,7 @@ function get_player_id(player)
            return id
        end
     end
-    return nil
+    return -1
 end
 
 function get_player_id_by_name(name)
@@ -350,7 +350,7 @@ function get_entity_id(entity)
 end
 
 function handle_entity(cmd, id, args)
-    minetest.log("action", cmd .. " on " .. (id and id or "?") .. " with " .. table.concat(args, ", "))
+    -- minetest.log("action", cmd .. " on " .. (id and id or "?") .. " with " .. table.concat(args, ", "))
     local entity
     if id == nil then
         entity = player_table[default_player_id]
@@ -678,7 +678,7 @@ function kill(window_identifier)
     if is_windows then
     	cmd = 'taskkill /F /FI "WINDOWTITLE eq  ' .. window_identifier .. '"'
     else
-        cmd = "kill `ps x | grep '\/mc[p]ipy\/' | grep -oe '^[0-9 ]*'`"
+        cmd = "kill `ps x | grep '\\/mc[p]ipy\\/' | grep -oe '^[0-9 ]*'`"
     end
     minetest.log(cmd)
     ie.os.execute(cmd)

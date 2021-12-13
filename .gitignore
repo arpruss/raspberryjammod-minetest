@@ -2,3 +2,6 @@
 __pycache__
 *.pyc
 _sunfish.py
+raspberryjammod/mcpipy/models/*.gz
+raspberryjammod/mcpipy/models/*.obj
+raspberryjammod/mcpipy/vehicles/*.schematic
