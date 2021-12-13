@@ -4,3 +4,13 @@ credits Downloaded from Martin O'Hanlon's repository
 swapyz 0
 size 100
 default IRON_BLOCK
+
+materials
+bluteal default
+bone default
+black default
+ltbrown default
+tan default
+blutan default
+brass default
+brown default

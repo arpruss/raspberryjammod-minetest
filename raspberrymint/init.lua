@@ -108,7 +108,7 @@ if ws then
 end
 
 minetest.register_privilege("jammer", {
-    description = "Can launch Raspberry Jam Mod stuff",
+    description = "Can launch Raspberry Mint stuff",
     give_to_singleplayer = false
 })
 
@@ -269,19 +269,19 @@ end
 
 minetest.register_chatcommand("py",
 	{params="[<script> [<args>]]" ,
-	description="Run python script in raspberryjammod/mcpipy directory, killing any previous script",
+	description="Run python script in raspberrymint/mcpipy directory, killing any previous script",
 	func = function(name, args) python(name, args, true) end })
 minetest.register_chatcommand("python",
 	{params="[<script> [<args>]]" ,
-	description="Run python script in raspberryjammod/mcpipy directory, killing any previous script",
+	description="Run python script in raspberrymint/mcpipy directory, killing any previous script",
 	func = function(name, args) python(name, args, true) end })
 minetest.register_chatcommand("apy",
 	{params="[<script> [<args>]]" ,
-	description="Run python script in raspberryjammod/mcpipy directory, without killing any previous script",
+	description="Run python script in raspberrymint/mcpipy directory, without killing any previous script",
 	func = function(name, args) python(name, args, false) end })
 minetest.register_chatcommand("addpython",
 	{params="[<script> [<args>]]" ,
-	description="Run python script in raspberryjammod/mcpipy directory, without killing any previous script",
+	description="Run python script in raspberrymint/mcpipy directory, without killing any previous script",
 	func = function(name, args) python(name, args, false) end })
 
 function python(name, args, kill_script)

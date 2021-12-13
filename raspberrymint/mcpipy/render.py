@@ -114,6 +114,9 @@ def parseBlock(data,default):
         b.data = int(eval(tokens[1]))
     return Block(b.id,b.data)
 
+def stringify(l):
+    return l if type(l) == str else l.decode()
+
 class MeshFile(object):
     def __init__(self):
         self.vertices = []
@@ -157,12 +160,12 @@ class MeshPLY(MeshFile):
     def __init__(self, filename, myopen=open, swapYZ=False):
         super(MeshPLY,self).__init__()
 
-        with myopen(filename, "r") as f:
-             assert f.readline().strip() == "ply"
-             assert f.readline().strip().startswith("format ascii")
+        with myopen(filename, mode="r") as f:
+             assert stringify(f.readline()).strip() == "ply"
+             assert stringify(f.readline()).strip().startswith("format ascii")
              elementCounts = []
              while True:
-                 line = f.readline().strip()
+                 line = stringify(f.readline()).strip()
                  if line == "end_header":
                      break
                  args = re.split("\\s+",line)
@@ -171,7 +174,7 @@ class MeshPLY(MeshFile):
              assert len(elementCounts) >= 2
              for element,count in elementCounts:
                  for i in range(count):
-                     line = f.readline().strip()
+                     line = stringify(f.readline()).strip()
                      if element == 'vertex':
                          args = re.split("\\s+",line)
                          if swapYZ:
@@ -681,7 +684,7 @@ class Mesh(object):
 
             with myopen(name, mode="r") as fh:
                 for line in fh:
-                    line = line.strip() if type(line) == str else line.strip().decode()
+                    line = stringify(line).strip()
                     if len(line) == 0 or line[0] == '#':
                         continue
                     line = re.split('\s+', line)
