@@ -1,0 +1,8 @@
+.idea
+__pycache__
+*.pyc
+_sunfish.py
+raspberrymint/mcpipy/models/*.gz
+raspberrymint/mcpipy/models/*.obj
+raspberrymint/mcpipy/vehicles/*.schematic
+raspberrymint/mcpipy/models/*.bak
